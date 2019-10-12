@@ -4,7 +4,17 @@
 #include "stdafx.hpp"
 
 void verify_format(const std::string& line) {
-    throw Exception("Not implemented");
+    // Make sure there is exactly one '>'
+    auto pos = line.find('>');
+
+    if (pos == std::string::npos) {
+        throw Exception("The line does not contain a '>'");
+    }
+
+    // Make sure there are no additional '>'
+    if (line.find('>', pos + 1) != std::string::npos) {
+        throw Exception("The line must contain exactly one '>'");
+    }
 }
 
 int main(int argc, const char** argv) {

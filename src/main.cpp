@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include "stdafx.hpp"
+#include "dependency.hpp"
 
 void verify_format(const std::string& line, int lineNumber) {
     // Make sure there is exactly one '>'
@@ -30,6 +31,28 @@ std::vector<std::string> parse_stdin() {
     return lines;
 }
 
+std::vector<Dependency> convert_dependencies(const std::vector<std::string>& lines) {
+    std::vector<Dependency> dependencies;
+    std::hash<std::string> hash_fn;
+
+    for (auto line: lines) {
+        // Convert to dependency struct
+        // lowercase and hash
+        //std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c){ return std::tolower(c); });
+        const size_t pos = line.find('>');
+
+        Dependency dependency;
+        dependency.ancestor = line.substr(0, pos);
+        dependency.child = line.substr(pos + 1);
+        dependency.ancestor_hash = hash_fn(dependency.ancestor);
+        dependency.child_hash = hash_fn(dependency.child);
+
+        dependencies.push_back(dependency);
+    }
+
+    return dependencies;
+}
+
 int main(int argc, const char** argv) {
     // Collect parsed lines
     std::vector<std::string> lines; 
@@ -40,11 +63,8 @@ int main(int argc, const char** argv) {
         return EXIT_FAILURE;
     }
 
+    // Convert parsed lines to dependency structs
+    std::vector<Dependency> dependencies = convert_dependencies(lines);
 
-    // Print all parsed lines
-    for (auto line: lines) {
-        std::cout << line << std::endl;
-    }
- 
     return EXIT_SUCCESS;
 } 

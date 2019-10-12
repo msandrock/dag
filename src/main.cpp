@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include "stdafx.hpp"
-#include "dependency.hpp"
+#include "dag.hpp"
 
 void verify_format(const std::string& line, int lineNumber) {
     // Make sure there is exactly one '>'
@@ -65,6 +65,11 @@ int main(int argc, const char** argv) {
 
     // Convert parsed lines to dependency structs
     std::vector<Dependency> dependencies = convert_dependencies(lines);
+    std::vector<DagNode*> startNodes = build_dag(dependencies);
+
+    for (const DagNode* startNode: startNodes) {
+        print_dag(startNode);
+    }
 
     return EXIT_SUCCESS;
 } 

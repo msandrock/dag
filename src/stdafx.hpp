@@ -4,11 +4,13 @@
 #include <exception>    // std::exception
 #include <locale>
 #include <string>       // std::string
+#include <sstream>
 
 //
-// Base class of all exceptions
+// Exceptions
 //
 class Exception : public std::exception {
+    protected:
     std::string message;
 
     public:
@@ -18,6 +20,22 @@ class Exception : public std::exception {
 
     std::string getMessage() {
         return this->message;
+    }
+};
+
+class ParseException : public Exception {
+    std::string line;
+    int lineNumber;
+
+    public:
+    ParseException(std::string message, std::string line, int lineNumber)
+        : Exception(message), line(line), lineNumber(lineNumber) {
+    }
+
+    std::string getMessage() {
+        std::stringstream message;
+        message << "Could not parse line " << this->lineNumber << " \"" << this->line << "\": " << this->message; 
+        return message.str(); 
     }
 };
 

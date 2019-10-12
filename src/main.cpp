@@ -68,7 +68,7 @@ int main(int argc, const char** argv) {
     std::vector<DagNode*> startNodes = build_dag(dependencies);
 
     for (const DagNode* startNode: startNodes) {
-        print_dag(startNode);
+        print_nodes(startNode, 0);
     }
 
     return EXIT_SUCCESS;

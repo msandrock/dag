@@ -1,5 +1,5 @@
 #pragma once
-#import <string>
+#include <string>
 
 struct Dependency {
     size_t ancestor_hash;
@@ -17,5 +17,4 @@ struct DagNode {
 };
 
 std::vector<DagNode*> build_dag(const std::vector<Dependency>& dependencies);
-void print_dag(const DagNode* startNode);
-void print_node(const DagNode* node, int level);
+void print_nodes(const DagNode* node, int level);

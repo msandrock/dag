@@ -13,10 +13,10 @@ namespace dag {
     struct DagNode {
         Dependency dependency;
         std::string name;
-        std::vector<DagNode*> ancestors;
-        std::vector<DagNode*> children;
+        std::vector<DagNode> ancestors;
+        std::vector<DagNode> children;
     };
 
-    std::vector<DagNode*> build_dag(const std::vector<Dependency>& dependencies);
-    void print_nodes(const DagNode* node, int level);
+    std::vector<DagNode> build_dag(const std::vector<Dependency>& dependencies);
+    void print_nodes(const DagNode& node, int level);
 }

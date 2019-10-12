@@ -31,8 +31,8 @@ std::vector<std::string> parse_stdin() {
     return lines;
 }
 
-std::vector<Dependency> convert_dependencies(const std::vector<std::string>& lines) {
-    std::vector<Dependency> dependencies;
+std::vector<dag::Dependency> convert_dependencies(const std::vector<std::string>& lines) {
+    std::vector<dag::Dependency> dependencies;
     std::hash<std::string> hash_fn;
 
     for (auto line: lines) {
@@ -41,7 +41,7 @@ std::vector<Dependency> convert_dependencies(const std::vector<std::string>& lin
         //std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c){ return std::tolower(c); });
         const size_t pos = line.find('>');
 
-        Dependency dependency;
+        dag::Dependency dependency;
         dependency.ancestor = line.substr(0, pos);
         dependency.child = line.substr(pos + 1);
         dependency.ancestor_hash = hash_fn(dependency.ancestor);
@@ -64,10 +64,10 @@ int main(int argc, const char** argv) {
     }
 
     // Convert parsed lines to dependency structs
-    std::vector<Dependency> dependencies = convert_dependencies(lines);
-    std::vector<DagNode*> startNodes = build_dag(dependencies);
+    std::vector<dag::Dependency> dependencies = convert_dependencies(lines);
+    std::vector<dag::DagNode*> startNodes = build_dag(dependencies);
 
-    for (const DagNode* startNode: startNodes) {
+    for (const dag::DagNode* startNode: startNodes) {
         print_nodes(startNode, 0);
     }
 

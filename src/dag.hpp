@@ -5,14 +5,12 @@ namespace dag {
     struct Dependency {
         size_t ancestor_hash;
         size_t child_hash;
-
         std::string ancestor;
         std::string child;
     };
 
     struct DagNode {
         Dependency dependency;
-        std::string name;
         std::vector<DagNode> ancestors;
         std::vector<DagNode> children;
     };

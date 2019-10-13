@@ -20,19 +20,14 @@ namespace dag {
     
     std::vector<DagNode> build_dag(const std::vector<Dependency>& dependencies) {
         std::vector<DagNode> startNodes;
-
         // 1. Every node that is not a child node is automatically a start node
         for (auto dependency: dependencies) {
             auto ancestor = find_ancestor(dependency, dependencies);
             
             if (ancestor == nullptr) {
-                std::cout << "Node " << dependency.ancestor << " has no ancestor" << std::endl;
-                /*std::unique_ptr<DagNode> startNode(new DagNode());
-                startNode->dependency = &dependency;
-                dependency.node = &startNode;
-                startNodes->push_back(startNode);*/
-            } else {
-                std::cout << "Node " << dependency.ancestor << " has an ancestor" << std::endl;
+                DagNode startNode;
+                startNode.dependency = dependency;
+                startNodes.push_back(startNode);
             }
         }
 
@@ -45,7 +40,7 @@ namespace dag {
     }
 
     void print_nodes(const DagNode& node, int level) {
-        std::cout << std::string(level, '\t') << node.name << std::endl;
+        std::cout << std::string(level, '\t') << node.dependency.ancestor << std::endl;
 
         for (const DagNode ancestor: node.ancestors) {
             print_nodes(ancestor, level + 1);

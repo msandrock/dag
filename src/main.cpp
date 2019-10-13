@@ -4,20 +4,26 @@
 #include "stdafx.hpp"
 #include "dag.hpp"
 
+/**
+ * Verify entries - throw exception on errors
+ */
 void verify_format(const std::string& line, int lineNumber) {
     // Make sure there is exactly one '>'
-    auto pos = line.find('>');
+    //auto pos = line.find('>');
 
-    if (pos == std::string::npos) {
-        throw ParseException("The line does not contain a '>'", line, lineNumber);
-    }
+    //if (pos == std::string::npos) {
+    //    throw ParseException("The line does not contain a '>'", line, lineNumber);
+    //}
 
-    // Make sure there are no additional '>'
-    if (line.find('>', pos + 1) != std::string::npos) {
-        throw ParseException("The line must contain exactly one '>'", line, lineNumber);
-    }
+    //// Make sure there are no additional '>'
+    //if (line.find('>', pos + 1) != std::string::npos) {
+    //    throw ParseException("The line must contain exactly one '>'", line, lineNumber);
+    //}
 }
 
+/**
+ * Consume all lines from stdin and return a list of verified entries
+ */
 std::vector<std::string> parse_stdin() {
     std::vector<std::string> lines;
     auto lineNumber = 1;
@@ -31,6 +37,9 @@ std::vector<std::string> parse_stdin() {
     return lines;
 }
 
+/**
+ * Convert list of lines into dependency structs
+ */
 std::vector<dag::Dependency> convert_dependencies(const std::vector<std::string>& lines) {
     std::vector<dag::Dependency> dependencies;
     std::hash<std::string> hash_fn;
@@ -40,12 +49,21 @@ std::vector<dag::Dependency> convert_dependencies(const std::vector<std::string>
         // lowercase and hash
         //std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c){ return std::tolower(c); });
         const size_t pos = line.find('>');
-
         dag::Dependency dependency;
-        dependency.ancestor = line.substr(0, pos);
-        dependency.child = line.substr(pos + 1);
-        dependency.ancestor_hash = hash_fn(dependency.ancestor);
-        dependency.child_hash = hash_fn(dependency.child);
+
+        if (pos != std::string::npos) {
+            // Item has a child dependency
+            dependency.ancestor = line.substr(0, pos);
+            dependency.child = line.substr(pos + 1);
+            dependency.ancestor_hash = hash_fn(dependency.ancestor);
+            dependency.child_hash = hash_fn(dependency.child);
+        } else {
+            // Item is a standalone item without dependency
+            dependency.ancestor = line;
+            dependency.ancestor_hash = hash_fn(dependency.ancestor);
+            dependency.child = "";
+            dependency.child_hash = 0;
+        }
 
         dependencies.push_back(dependency);
     }

@@ -7,13 +7,13 @@ namespace dag {
     /**
      * Loop over all dependencies and find the upstream node
      */
-    void find_upstream_dependency(const Dependency& current, std::vector<Dependency>& dependencies, Dependency** found) {
+    void find_upstream_dependency(Dependency* current, std::vector<Dependency>* dependencies, Dependency** found) {
         // TODO: Maybe add support to find multiple ancestors?
         int i = 0;
-        for (auto dependency: dependencies) {
-            if (dependency.downstream_hash == current.name_hash) {
+        for (auto dependency: *dependencies) {
+            if (dependency.downstream_hash == current->name_hash) {
                 // Obtain pointer into vector
-                *found = &(dependencies.data()[i]);
+                *found = &(dependencies->data()[i]);
                 return;
             }
             i++;
@@ -23,26 +23,34 @@ namespace dag {
     /**
      * Append direct child nodes to the current node
      */ 
-    void append_dependencies(DagNode& currentNode, std::vector<Dependency>& dependencies) {
+    void append_dependencies(DagNode* currentNode, std::vector<Dependency>* dependencies) {
         // Find all nodes that have the current node as a parent
-        for (auto dependency: dependencies) {
+        for (auto dependency: *dependencies) {
             // No self-referencing
-            if (dependency.name_hash == currentNode.dependency.name_hash) {
+            if (dependency.name_hash == currentNode->dependency.name_hash) {
                 continue;
             }
 
             Dependency* ancestor = nullptr;
-            find_upstream_dependency(dependency, dependencies, &ancestor);
+            find_upstream_dependency(&dependency, dependencies, &ancestor);
 
             // Dependency has no ancestor
             if (ancestor == nullptr) {
                 continue;
             }
 
-            // Is the start node the ancestor?
-            if (ancestor->name_hash == currentNode.dependency.name_hash) {
+            // Is the upstream node ancestor to the current node?
+            if (ancestor->name_hash == currentNode->dependency.name_hash) {
                 // Add the current node as a child
-                std::cout << dependency.name << " is a direct child of " << currentNode.dependency.name << std::endl;
+                std::cout << dependency.name << " is a direct child of " << currentNode->dependency.name << std::endl;
+
+                DagNode newNode;
+                newNode.dependency = dependency;
+
+                currentNode->children.push_back(&newNode);
+                newNode.ancestors.push_back(currentNode);
+
+                append_dependencies(&newNode, dependencies);
             }
         }
     }
@@ -50,40 +58,40 @@ namespace dag {
     /**
      * Construct dag from the given dependencies
      */ 
-    std::vector<DagNode> build_dag(std::vector<Dependency>& dependencies) {
-        std::vector<DagNode> startNodes;
+    void build_dag(std::vector<Dependency>* dependencies, std::vector<DagNode>* startNodes) {
         // 1. Every node that is not a child node is automatically a start node
-        for (auto dependency: dependencies) {
+        for (auto dependency: *dependencies) {
             Dependency* ancestor = nullptr;
-            find_upstream_dependency(dependency, dependencies, &ancestor);
+            find_upstream_dependency(&dependency, dependencies, &ancestor);
             
             if (ancestor == nullptr) {
                 DagNode startNode;
                 startNode.dependency = dependency;
-                startNodes.push_back(startNode);
+                startNodes->push_back(startNode);
             }
         }
 
         // Construct dags for all start nodes
-        for (auto startNode: startNodes) {
+        for (auto startNode: *startNodes) {
             // Pass in the current dag - add all nodes to the end nodes
             // dag, current node, dependencies
-            append_dependencies(startNode, dependencies);
+            append_dependencies(&startNode, dependencies);
         }
 
         // Compare every node with the others - if it is not a child node, then it's a start node
             // once assigned, flag it as consumed
 
         // 2. Every node that references an ancestor node is invalid
-
-        return startNodes;
     }
 
-    void print_nodes(const DagNode& node, int level) {
-        std::cout << std::string(level, '\t') << node.dependency.name << std::endl;
+    /**
+     * Print a text representation of the dag
+     */
+    void print_nodes(DagNode* node, int level) {
+        std::cout << std::string(level, '\t') << node->dependency.name << std::endl;
 
-        for (const DagNode ancestor: node.ancestors) {
-            print_nodes(ancestor, level + 1);
+        for (DagNode* childNode: node->children) {
+            print_nodes(childNode, level + 1);
         }
     }
 }

@@ -53,16 +53,16 @@ std::vector<dag::Dependency> convert_dependencies(const std::vector<std::string>
 
         if (pos != std::string::npos) {
             // Item has a child dependency
-            dependency.ancestor = line.substr(0, pos);
-            dependency.child = line.substr(pos + 1);
-            dependency.ancestor_hash = hash_fn(dependency.ancestor);
-            dependency.child_hash = hash_fn(dependency.child);
+            dependency.name = line.substr(0, pos);
+            dependency.downstream = line.substr(pos + 1);
+            dependency.name_hash = hash_fn(dependency.name);
+            dependency.downstream_hash = hash_fn(dependency.downstream);
         } else {
             // Item is a standalone item without dependency
-            dependency.ancestor = line;
-            dependency.ancestor_hash = hash_fn(dependency.ancestor);
-            dependency.child = "";
-            dependency.child_hash = 0;
+            dependency.name = line;
+            dependency.name_hash = hash_fn(dependency.name);
+            dependency.downstream = "";
+            dependency.downstream_hash = 0;
         }
 
         dependencies.push_back(dependency);
@@ -79,6 +79,10 @@ int main(int argc, const char** argv) {
     } catch(ParseException e) {
         std::cout << e.getMessage() << std::endl;
         return EXIT_FAILURE;
+    }
+
+    for (auto line: lines) {
+        std::cout << "Line: " << line << std::endl;
     }
 
     // Convert parsed lines to dependency structs

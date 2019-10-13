@@ -3,10 +3,10 @@
 
 namespace dag {
     struct Dependency {
-        size_t ancestor_hash;
-        size_t child_hash;
-        std::string ancestor;
-        std::string child;
+        size_t name_hash;
+        size_t downstream_hash;
+        std::string name;
+        std::string downstream;
     };
 
     struct DagNode {
@@ -15,6 +15,6 @@ namespace dag {
         std::vector<DagNode> children;
     };
 
-    std::vector<DagNode> build_dag(const std::vector<Dependency>& dependencies);
+    std::vector<DagNode> build_dag(std::vector<Dependency>& dependencies);
     void print_nodes(const DagNode& node, int level);
 }

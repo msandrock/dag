@@ -73,6 +73,10 @@ std::vector<dag::Dependency> convert_dependencies(const std::vector<std::string>
 }
 
 int main(int argc, const char** argv) {
+#ifdef TEST
+    std::cout << "Running tests" << std::endl;
+    return EXIT_SUCCESS;
+#endif
     // Collect parsed lines
     std::vector<std::string> lines; 
     try {

@@ -1,4 +1,5 @@
 #include <iostream> // std::cout
+#include <memory>
 #include <string>
 #include <vector>
 #include "stdafx.hpp"
@@ -87,11 +88,11 @@ int main(int argc, const char** argv) {
 
     // Convert parsed lines to dependency structs
     std::vector<dag::Dependency> dependencies = convert_dependencies(lines);
-    std::vector<dag::DagNode> startNodes;
+    std::vector<std::shared_ptr<dag::DagNode>> startNodes;
     build_dag(&dependencies, &startNodes);
 
-    for (dag::DagNode startNode: startNodes) {
-        print_nodes(&startNode, 0);
+    for (auto startNode: startNodes) {
+        print_nodes(startNode, 0);
     }
 
     return EXIT_SUCCESS;

@@ -23,7 +23,7 @@ namespace dag {
     /**
      * Append direct child nodes to the current node
      */ 
-    void append_dependencies(DagNode* currentNode, std::vector<Dependency>* dependencies) {
+    void append_dependencies(std::shared_ptr<DagNode> currentNode, std::vector<Dependency>* dependencies) {
         // Find all nodes that have the current node as a parent
         for (auto dependency: *dependencies) {
             // No self-referencing
@@ -41,16 +41,16 @@ namespace dag {
 
             // Is the upstream node ancestor to the current node?
             if (ancestor->name_hash == currentNode->dependency.name_hash) {
-                // Add the current node as a child
-                std::cout << dependency.name << " is a direct child of " << currentNode->dependency.name << std::endl;
+                // Add the current dependency as a child node
+                std::shared_ptr<DagNode> newNode(new DagNode);
+                newNode->dependency = dependency;
 
-                DagNode newNode;
-                newNode.dependency = dependency;
+                std::cout << "Add " << newNode->dependency.name << " to " << currentNode->dependency.name << std::endl;
 
-                currentNode->children.push_back(&newNode);
-                newNode.ancestors.push_back(currentNode);
+                currentNode->children.push_back(newNode);
+                newNode->ancestors.push_back(currentNode);
 
-                append_dependencies(&newNode, dependencies);
+                append_dependencies(newNode, dependencies);
             }
         }
     }
@@ -58,15 +58,15 @@ namespace dag {
     /**
      * Construct dag from the given dependencies
      */ 
-    void build_dag(std::vector<Dependency>* dependencies, std::vector<DagNode>* startNodes) {
+    void build_dag(std::vector<Dependency>* dependencies, std::vector<std::shared_ptr<DagNode>>* startNodes) {
         // 1. Every node that is not a child node is automatically a start node
         for (auto dependency: *dependencies) {
             Dependency* ancestor = nullptr;
             find_upstream_dependency(&dependency, dependencies, &ancestor);
             
             if (ancestor == nullptr) {
-                DagNode startNode;
-                startNode.dependency = dependency;
+                std::shared_ptr<DagNode> startNode(new DagNode);
+                startNode->dependency = dependency;
                 startNodes->push_back(startNode);
             }
         }
@@ -75,7 +75,7 @@ namespace dag {
         for (auto startNode: *startNodes) {
             // Pass in the current dag - add all nodes to the end nodes
             // dag, current node, dependencies
-            append_dependencies(&startNode, dependencies);
+            append_dependencies(startNode, dependencies);
         }
 
         // Compare every node with the others - if it is not a child node, then it's a start node
@@ -87,10 +87,11 @@ namespace dag {
     /**
      * Print a text representation of the dag
      */
-    void print_nodes(DagNode* node, int level) {
+    void print_nodes(std::shared_ptr<DagNode> node, int level) {
         std::cout << std::string(level, '\t') << node->dependency.name << std::endl;
+        std::cout << "downstream nodes: " << node->children.size() << std::endl;
 
-        for (DagNode* childNode: node->children) {
+        for (auto childNode: node->children) {
             print_nodes(childNode, level + 1);
         }
     }

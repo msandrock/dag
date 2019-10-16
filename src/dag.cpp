@@ -91,6 +91,18 @@ namespace dag {
     }
 
     /**
+     * Count the number of nodes in the dag
+     */
+    void count_nodes(std::shared_ptr<DagNode> node, std::set<size_t>& accumulator) {
+        // If the node is already in the set, do not add it again
+        accumulator.insert(node->dependency.getNameHash());
+
+        for (auto child: node->children) {
+            count_nodes(child, accumulator);
+        }
+    }
+
+    /**
      * Print a text representation of the dag
      */
     void print_nodes(std::shared_ptr<DagNode> node, int level) {

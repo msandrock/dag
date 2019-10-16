@@ -1,4 +1,5 @@
 #pragma once
+#include <set>
 #include <string>
 
 namespace dag {
@@ -26,5 +27,6 @@ namespace dag {
     };
 
     void build_dag(std::vector<Dependency>* dependencies, std::vector<std::shared_ptr<DagNode>>* startNodes);
+    void count_nodes(std::shared_ptr<DagNode> node, std::set<size_t>& accumulator);
     void print_nodes(std::shared_ptr<DagNode> node, int level);
 }

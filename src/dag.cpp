@@ -4,6 +4,15 @@
 #include "dag.hpp"
 
 namespace dag {
+
+    Dependency::Dependency(const std::string& name, const std::string& downstream) {
+        std::hash<std::string> hash_fn;
+        this->name = name;
+        this->downstream = downstream;
+        this->name_hash = hash_fn(name);
+        this->downstream_hash = hash_fn(downstream);
+    }
+
     /**
      * Loop over all dependencies and find the upstream node
      */
@@ -11,7 +20,7 @@ namespace dag {
         // TODO: Maybe add support to find multiple ancestors?
         int i = 0;
         for (auto dependency: *dependencies) {
-            if (dependency.downstream_hash == current->name_hash) {
+            if (dependency.getDownstreamHash() == current->getNameHash()) {
                 // Obtain pointer into vector
                 *found = &(dependencies->data()[i]);
                 return;
@@ -27,7 +36,7 @@ namespace dag {
         // Find all nodes that have the current node as a parent
         for (auto dependency: *dependencies) {
             // No self-referencing
-            if (dependency.name_hash == currentNode->dependency.name_hash) {
+            if (dependency.getNameHash() == currentNode->dependency.getNameHash()) {
                 continue;
             }
 
@@ -40,12 +49,10 @@ namespace dag {
             }
 
             // Is the upstream node ancestor to the current node?
-            if (ancestor->name_hash == currentNode->dependency.name_hash) {
+            if (ancestor->getNameHash() == currentNode->dependency.getNameHash()) {
                 // Add the current dependency as a child node
-                std::shared_ptr<DagNode> newNode(new DagNode);
-                newNode->dependency = dependency;
-
-                std::cout << "Add " << newNode->dependency.name << " to " << currentNode->dependency.name << std::endl;
+                std::shared_ptr<DagNode> newNode(new DagNode(dependency));
+                std::cout << "Add " << newNode->dependency.getName() << " to " << currentNode->dependency.getName() << std::endl;
 
                 currentNode->children.push_back(newNode);
                 newNode->ancestors.push_back(currentNode);
@@ -65,8 +72,7 @@ namespace dag {
             find_upstream_dependency(&dependency, dependencies, &ancestor);
             
             if (ancestor == nullptr) {
-                std::shared_ptr<DagNode> startNode(new DagNode);
-                startNode->dependency = dependency;
+                std::shared_ptr<DagNode> startNode(new DagNode(dependency));
                 startNodes->push_back(startNode);
             }
         }
@@ -88,7 +94,7 @@ namespace dag {
      * Print a text representation of the dag
      */
     void print_nodes(std::shared_ptr<DagNode> node, int level) {
-        std::cout << std::string(level, '\t') << node->dependency.name << std::endl;
+        std::cout << std::string(level, '\t') << node->dependency.getName() << std::endl;
         std::cout << "downstream nodes: " << node->children.size() << std::endl;
 
         for (auto childNode: node->children) {

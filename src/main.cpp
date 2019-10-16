@@ -43,30 +43,26 @@ std::vector<std::string> parse_stdin() {
  */
 std::vector<dag::Dependency> convert_dependencies(const std::vector<std::string>& lines) {
     std::vector<dag::Dependency> dependencies;
-    std::hash<std::string> hash_fn;
 
     for (auto line: lines) {
         // Convert to dependency struct
         // lowercase and hash
         //std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c){ return std::tolower(c); });
         const size_t pos = line.find('>');
-        dag::Dependency dependency;
+        std::string name;
+        std::string downstream;
 
         if (pos != std::string::npos) {
             // Item has a child dependency
-            dependency.name = line.substr(0, pos);
-            dependency.downstream = line.substr(pos + 1);
-            dependency.name_hash = hash_fn(dependency.name);
-            dependency.downstream_hash = hash_fn(dependency.downstream);
+            name = line.substr(0, pos);
+            downstream = line.substr(pos + 1);
         } else {
             // Item is a standalone item without dependency
-            dependency.name = line;
-            dependency.name_hash = hash_fn(dependency.name);
-            dependency.downstream = "";
-            dependency.downstream_hash = 0;
+            name = line;
+            downstream = "";
         }
 
-        dependencies.push_back(dependency);
+        dependencies.push_back(dag::Dependency(name, downstream));
     }
 
     return dependencies;
@@ -74,6 +70,11 @@ std::vector<dag::Dependency> convert_dependencies(const std::vector<std::string>
 
 int main(int argc, const char** argv) {
 #ifdef TEST
+
+    // add test for convert_dependencies
+    // add dag_test.cpp
+    // add function to count nodes in dag
+
     std::cout << "Running tests" << std::endl;
     return EXIT_SUCCESS;
 #endif

@@ -25,6 +25,42 @@ namespace dag {
     }
 
     /**
+     * Convert list of lines into dependency structs
+     */
+    std::vector<dag::Dependency> convert_dependencies(const std::vector<std::string>& lines) {
+        std::vector<dag::Dependency> dependencies;
+
+        for (auto line: lines) {
+            // Convert to dependency struct
+            // lowercase and hash
+            //std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c){ return std::tolower(c); });
+            const size_t pos = line.find('>');
+            std::string name;
+            std::string downstream;
+
+            if (pos != std::string::npos) {
+                // Item has a child dependency
+                name = line.substr(0, pos);
+                downstream = line.substr(pos + 1);
+            } else {
+                // Item is a standalone item without dependency
+                name = line;
+                downstream = "";
+            }
+
+            dependencies.push_back(dag::Dependency(name, downstream));
+
+            // If the downstream node is not an upstream dependency, add it as a standalone node
+            // Find nodes that have the downstream node as a dependency
+            // e.g. a>b - b is not a dependency of any other node - add it as standalone
+
+
+        }
+
+        return dependencies;
+    }
+
+    /**
      * Loop over all dependencies and find the upstream node
      */
     void find_upstream_dependency(Dependency* current, std::vector<Dependency>* dependencies, Dependency** found) {

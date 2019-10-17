@@ -43,36 +43,6 @@ std::vector<std::string> parse_stdin() {
     return lines;
 }
 
-/**
- * Convert list of lines into dependency structs
- */
-std::vector<dag::Dependency> convert_dependencies(const std::vector<std::string>& lines) {
-    std::vector<dag::Dependency> dependencies;
-
-    for (auto line: lines) {
-        // Convert to dependency struct
-        // lowercase and hash
-        //std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c){ return std::tolower(c); });
-        const size_t pos = line.find('>');
-        std::string name;
-        std::string downstream;
-
-        if (pos != std::string::npos) {
-            // Item has a child dependency
-            name = line.substr(0, pos);
-            downstream = line.substr(pos + 1);
-        } else {
-            // Item is a standalone item without dependency
-            name = line;
-            downstream = "";
-        }
-
-        dependencies.push_back(dag::Dependency(name, downstream));
-    }
-
-    return dependencies;
-}
-
 int main(int argc, const char** argv) {
 #ifdef TEST
     run_all_tests();
@@ -92,7 +62,7 @@ int main(int argc, const char** argv) {
     }
 
     // Convert parsed lines to dependency structs
-    std::vector<dag::Dependency> dependencies = convert_dependencies(lines);
+    std::vector<dag::Dependency> dependencies = dag::convert_dependencies(lines);
     std::vector<std::shared_ptr<dag::DagNode>> startNodes;
     build_dag(&dependencies, &startNodes);
 

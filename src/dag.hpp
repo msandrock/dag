@@ -35,6 +35,7 @@ namespace dag {
         size_t getNameHash() const { return name_hash; }
     };
 
+    std::vector<dag::Dependency> convert_dependencies(const std::vector<std::string>& lines);
     void build_dag(std::vector<Dependency>* dependencies, std::vector<std::shared_ptr<DagNode>>* startNodes);
     void count_nodes(std::shared_ptr<DagNode> node, std::set<size_t>& accumulator);
     void print_nodes(std::shared_ptr<DagNode> node, int level);

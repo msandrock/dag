@@ -1,4 +1,5 @@
 dag
-dag.dSYM
+dag_test
+*.dSYM
 notes.md
 .vscode

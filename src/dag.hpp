@@ -1,6 +1,7 @@
 #pragma once
 #include <set>
 #include <string>
+#include <vector>
 
 namespace dag {
     class Dependency {
@@ -11,7 +12,12 @@ namespace dag {
 
         public:
         Dependency(const std::string& name, const std::string& downstream);
-
+        // Implement custom < operator to implement value compare
+        /*bool operator< (const Dependency& other) const {
+            size_t lhsVal = name_hash + downstream_hash;
+            size_t rhsVal = other.getNameHash() + other.getDownstreamHash();
+            return (lhsVal < rhsVal);
+        }*/
         std::string getName() const { return name; }
         std::string getDownstream() const { return downstream; }
         size_t getNameHash() const { return name_hash; }

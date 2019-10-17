@@ -13,7 +13,7 @@ ${BINARY}: src/*.cpp
 	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
 
 ${TEST_BINARY}: src/*.cpp
-	$(CC) $(CFGLAGS) -DTEST=1 -o $@ $^ $(LFLAGS)
+	$(CC) $(CFLAGS) -DTEST=1 -o $@ $^ $(LFLAGS)
 
 clean:
 	if [ -f ${BINARY} ] ; then rm ${BINARY} ; fi

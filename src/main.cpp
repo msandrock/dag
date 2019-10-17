@@ -6,6 +6,10 @@
 #include "stdafx.hpp"
 #include "dag.hpp"
 
+#ifdef TEST
+#include "test.hpp"
+#endif
+
 /**
  * Verify entries - throw exception on errors
  */
@@ -71,12 +75,7 @@ std::vector<dag::Dependency> convert_dependencies(const std::vector<std::string>
 
 int main(int argc, const char** argv) {
 #ifdef TEST
-
-    // add test for convert_dependencies
-    // add dag_test.cpp
-    // add function to count nodes in dag
-
-    std::cout << "Running tests" << std::endl;
+    run_all_tests();
     return EXIT_SUCCESS;
 #endif
     // Collect parsed lines

@@ -13,8 +13,8 @@ void test_convert_dependencies() {
         lines.push_back("a");
         auto dependencies = dag::convert_dependencies(lines);
         assert(dependencies.size() == 1);
-        assert(dependencies[0].getName() == "a");
-        assert(dependencies[0].getDownstream() == "");
+        assert(dependencies[0].name == "a");
+        assert(dependencies[0].downstreams.size() == 0);
     }
     {
         std::vector<std::string> lines;
@@ -34,7 +34,7 @@ void test_convert_dependencies() {
     // Only one dag should be generated
     assert(nodes.size() == 1);
     // Count nodes
-    std::set<size_t> accumulator; 
+    std::set<std::string> accumulator; 
     dag::count_nodes(nodes[0], accumulator);
     // The dag should consist of the two nodes 'a' and 'b'
     assert(accumulator.size() == 2);

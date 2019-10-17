@@ -5,20 +5,10 @@
 
 namespace dag {
     /**
-     * Instantiate a new dependency; Calculate and store hashes
-     */
-    Dependency::Dependency(const std::string& name, const std::string& downstream) {
-        this->name = name;
-        this->downstream = downstream;
-    }
-
-    /**
      * Instantiate a new dag node; Calculate and store name hash
      */
     DagNode::DagNode(const std::string& name) {
-        std::hash<std::string> hash_fn;
         this->name = name;
-        this->name_hash = hash_fn(name);
     }
 
     /**
@@ -30,24 +20,22 @@ namespace dag {
         for (auto line: lines) {
             // Convert to dependency struct
             const size_t pos = line.find('>');
-            std::string name;
-            std::string downstream;
 
             if (pos != std::string::npos) {
                 // Item has a child dependency
-                name = line.substr(0, pos);
-                downstream = line.substr(pos + 1);
+                dag::Dependency dependency = { line.substr(0, pos) };
+                dependency.downstreams.insert(line.substr(pos + 1));
+
+                dependencies.push_back(dependency);
 
                 // If the downstream node is not an upstream dependency to another node, add it as a standalone node
                 // Find nodes that have the downstream node as a dependency
                 // e.g. a>b - b is not a dependency of any other node - add it as standalone
             } else {
                 // Item is a standalone item without dependency
-                name = line;
-                downstream = "";
+                dag::Dependency dependency = { line };
+                dependencies.push_back(dependency);
             }
-
-            dependencies.push_back(dag::Dependency(name, downstream));
         }
 
         // TODO: Merge and unify dependencies
@@ -68,10 +56,13 @@ namespace dag {
         // TODO: Maybe add support to find multiple ancestors?
         int i = 0;
         for (auto dependency: *dependencies) {
-            if (dependency.getDownstreamHash() == current->getNameHash()) {
-                // Obtain pointer into vector
-                *found = &(dependencies->data()[i]);
-                return;
+            // Loop over all downstream dependencies
+            for (auto downstream: dependency.downstreams) {
+                if (downstream == current->name) {
+                    // Obtain pointer into vector
+                    *found = &(dependencies->data()[i]);
+                    return;
+                }
             }
             i++;
         }
@@ -84,7 +75,7 @@ namespace dag {
         // Find all nodes that have the current node as a parent
         for (auto dependency: *dependencies) {
             // No self-referencing
-            if (dependency.getNameHash() == currentNode->getNameHash()) {
+            if (dependency.name == currentNode->getName()) {
                 continue;
             }
 
@@ -97,9 +88,9 @@ namespace dag {
             }
 
             // Is the upstream node ancestor to the current node?
-            if (ancestor->getNameHash() == currentNode->getNameHash()) {
+            if (ancestor->name == currentNode->getName()) {
                 // Add the current dependency as a child node
-                std::shared_ptr<DagNode> newNode(new DagNode(dependency.getName()));
+                std::shared_ptr<DagNode> newNode(new DagNode(dependency.name));
                 std::cout << "Add " << newNode->getName() << " to " << currentNode->getName() << std::endl;
 
                 currentNode->children.push_back(newNode);
@@ -120,7 +111,7 @@ namespace dag {
             find_upstream_dependency(&dependency, dependencies, &ancestor);
             
             if (ancestor == nullptr) {
-                std::shared_ptr<DagNode> startNode(new DagNode(dependency.getName()));
+                std::shared_ptr<DagNode> startNode(new DagNode(dependency.name));
                 startNodes->push_back(startNode);
             }
         }
@@ -143,9 +134,9 @@ namespace dag {
     /**
      * Count the number of nodes in the dag
      */
-    void count_nodes(std::shared_ptr<DagNode> node, std::set<size_t>& accumulator) {
+    void count_nodes(std::shared_ptr<DagNode> node, std::set<std::string>& accumulator) {
         // If the node is already in the set, do not add it again
-        accumulator.insert(node->getNameHash());
+        accumulator.insert(node->getName());
 
         for (auto child: node->children) {
             count_nodes(child, accumulator);

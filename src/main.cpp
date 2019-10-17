@@ -97,10 +97,6 @@ int main(int argc, const char** argv) {
     build_dag(&dependencies, &startNodes);
 
     for (auto startNode: startNodes) {
-        std::set<size_t> accumulator;
-        count_nodes(startNode, accumulator);
-        std::cout << "Dag has " << accumulator.size() << " nodes." << std::endl;
-
         print_nodes(startNode, 0);
     }
 

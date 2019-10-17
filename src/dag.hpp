@@ -5,8 +5,6 @@
 
 namespace dag {
     class Dependency {
-        size_t name_hash;
-        size_t downstream_hash;
         std::string name;
         std::string downstream;
 
@@ -20,8 +18,14 @@ namespace dag {
         }*/
         std::string getName() const { return name; }
         std::string getDownstream() const { return downstream; }
-        size_t getNameHash() const { return name_hash; }
-        size_t getDownstreamHash() const { return downstream_hash; }
+        size_t getNameHash() const {
+            std::hash<std::string> hash_fn;
+            return hash_fn(name);
+        }
+        size_t getDownstreamHash() const {
+            std::hash<std::string> hash_fn;
+            return hash_fn(downstream);
+        }
     };
 
     struct DagNode {

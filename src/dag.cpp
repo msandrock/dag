@@ -8,11 +8,8 @@ namespace dag {
      * Instantiate a new dependency; Calculate and store hashes
      */
     Dependency::Dependency(const std::string& name, const std::string& downstream) {
-        std::hash<std::string> hash_fn;
         this->name = name;
         this->downstream = downstream;
-        this->name_hash = hash_fn(name);
-        this->downstream_hash = hash_fn(downstream);
     }
 
     /**
@@ -32,8 +29,6 @@ namespace dag {
 
         for (auto line: lines) {
             // Convert to dependency struct
-            // lowercase and hash
-            //std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c){ return std::tolower(c); });
             const size_t pos = line.find('>');
             std::string name;
             std::string downstream;
@@ -42,6 +37,10 @@ namespace dag {
                 // Item has a child dependency
                 name = line.substr(0, pos);
                 downstream = line.substr(pos + 1);
+
+                // If the downstream node is not an upstream dependency to another node, add it as a standalone node
+                // Find nodes that have the downstream node as a dependency
+                // e.g. a>b - b is not a dependency of any other node - add it as standalone
             } else {
                 // Item is a standalone item without dependency
                 name = line;
@@ -49,13 +48,15 @@ namespace dag {
             }
 
             dependencies.push_back(dag::Dependency(name, downstream));
-
-            // If the downstream node is not an upstream dependency, add it as a standalone node
-            // Find nodes that have the downstream node as a dependency
-            // e.g. a>b - b is not a dependency of any other node - add it as standalone
-
-
         }
+
+        // TODO: Merge and unify dependencies
+        // a>b
+        // a>c
+        // --> a>b+c
+        
+        // Downstream nodes need to be an array
+
 
         return dependencies;
     }

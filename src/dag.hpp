@@ -18,7 +18,8 @@ namespace dag {
         std::string getName() const { return name; }
     };
 
-    std::vector<dag::Dependency> convert_dependencies(const std::vector<std::string>& lines);
+    Dependency convert_dependency(const std::string& line);
+    std::vector<Dependency> convert_dependencies(const std::vector<std::string>& lines);
     void build_dag(std::vector<Dependency>* dependencies, std::vector<std::shared_ptr<DagNode>>* startNodes);
     void count_nodes(std::shared_ptr<DagNode> node, std::set<std::string>& accumulator);
     void print_nodes(std::shared_ptr<DagNode> node, int level);

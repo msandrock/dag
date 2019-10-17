@@ -12,30 +12,35 @@ namespace dag {
     }
 
     /**
+     * Convert single line to dependency
+     */
+    Dependency convert_dependency(const std::string& line) {
+        // Convert to dependency struct
+        Dependency dependency = { line };
+        const auto pos = line.find('>');
+
+        if (pos != std::string::npos) {
+            // Item has a child dependency
+            dependency.name = line.substr(0, pos);
+            dependency.downstreams.insert(line.substr(pos + 1));
+        }
+
+        return dependency;
+    }
+
+    /**
      * Convert list of lines into dependency structs
      */
-    std::vector<dag::Dependency> convert_dependencies(const std::vector<std::string>& lines) {
-        std::vector<dag::Dependency> dependencies;
+    std::vector<Dependency> convert_dependencies(const std::vector<std::string>& lines) {
+        std::vector<Dependency> dependencies;
 
         for (auto line: lines) {
-            // Convert to dependency struct
-            const size_t pos = line.find('>');
+            auto dependency = convert_dependency(line);
+            dependencies.push_back(dependency);
 
-            if (pos != std::string::npos) {
-                // Item has a child dependency
-                dag::Dependency dependency = { line.substr(0, pos) };
-                dependency.downstreams.insert(line.substr(pos + 1));
-
-                dependencies.push_back(dependency);
-
-                // If the downstream node is not an upstream dependency to another node, add it as a standalone node
-                // Find nodes that have the downstream node as a dependency
-                // e.g. a>b - b is not a dependency of any other node - add it as standalone
-            } else {
-                // Item is a standalone item without dependency
-                dag::Dependency dependency = { line };
-                dependencies.push_back(dependency);
-            }
+            // If the downstream node is not an upstream dependency to another node, add it as a standalone node
+            // Find nodes that have the downstream node as a dependency
+            // e.g. a>b - b is not a dependency of any other node - add it as standalone
         }
 
         // TODO: Merge and unify dependencies

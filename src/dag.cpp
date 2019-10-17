@@ -4,13 +4,24 @@
 #include "dag.hpp"
 
 namespace dag {
-
+    /**
+     * Instantiate a new dependency; Calculate and store hashes
+     */
     Dependency::Dependency(const std::string& name, const std::string& downstream) {
         std::hash<std::string> hash_fn;
         this->name = name;
         this->downstream = downstream;
         this->name_hash = hash_fn(name);
         this->downstream_hash = hash_fn(downstream);
+    }
+
+    /**
+     * Instantiate a new dag node; Calculate and store name hash
+     */
+    DagNode::DagNode(const std::string& name) {
+        std::hash<std::string> hash_fn;
+        this->name = name;
+        this->name_hash = hash_fn(name);
     }
 
     /**
@@ -36,7 +47,7 @@ namespace dag {
         // Find all nodes that have the current node as a parent
         for (auto dependency: *dependencies) {
             // No self-referencing
-            if (dependency.getNameHash() == currentNode->dependency.getNameHash()) {
+            if (dependency.getNameHash() == currentNode->getNameHash()) {
                 continue;
             }
 
@@ -49,10 +60,10 @@ namespace dag {
             }
 
             // Is the upstream node ancestor to the current node?
-            if (ancestor->getNameHash() == currentNode->dependency.getNameHash()) {
+            if (ancestor->getNameHash() == currentNode->getNameHash()) {
                 // Add the current dependency as a child node
-                std::shared_ptr<DagNode> newNode(new DagNode(dependency));
-                std::cout << "Add " << newNode->dependency.getName() << " to " << currentNode->dependency.getName() << std::endl;
+                std::shared_ptr<DagNode> newNode(new DagNode(dependency.getName()));
+                std::cout << "Add " << newNode->getName() << " to " << currentNode->getName() << std::endl;
 
                 currentNode->children.push_back(newNode);
                 newNode->ancestors.push_back(currentNode);
@@ -72,7 +83,7 @@ namespace dag {
             find_upstream_dependency(&dependency, dependencies, &ancestor);
             
             if (ancestor == nullptr) {
-                std::shared_ptr<DagNode> startNode(new DagNode(dependency));
+                std::shared_ptr<DagNode> startNode(new DagNode(dependency.getName()));
                 startNodes->push_back(startNode);
             }
         }
@@ -97,7 +108,7 @@ namespace dag {
      */
     void count_nodes(std::shared_ptr<DagNode> node, std::set<size_t>& accumulator) {
         // If the node is already in the set, do not add it again
-        accumulator.insert(node->dependency.getNameHash());
+        accumulator.insert(node->getNameHash());
 
         for (auto child: node->children) {
             count_nodes(child, accumulator);
@@ -108,7 +119,7 @@ namespace dag {
      * Print a text representation of the dag
      */
     void print_nodes(std::shared_ptr<DagNode> node, int level) {
-        std::cout << std::string(level, '\t') << node->dependency.getName() << std::endl;
+        std::cout << std::string(level, '\t') << node->getName() << std::endl;
         std::cout << "downstream nodes: " << node->children.size() << std::endl;
 
         for (auto childNode: node->children) {

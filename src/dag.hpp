@@ -25,11 +25,14 @@ namespace dag {
     };
 
     struct DagNode {
-        Dependency dependency;
+        std::string name;
+        size_t name_hash;
         std::vector<std::shared_ptr<DagNode>> ancestors;
         std::vector<std::shared_ptr<DagNode>> children;
 
-        DagNode(const Dependency& dependency) : dependency(dependency) {}
+        DagNode(const std::string& name);
+        std::string getName() const { return name; }
+        size_t getNameHash() const { return name_hash; }
     };
 
     void build_dag(std::vector<Dependency>* dependencies, std::vector<std::shared_ptr<DagNode>>* startNodes);

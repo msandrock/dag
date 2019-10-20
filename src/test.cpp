@@ -6,7 +6,7 @@
 #include "test.hpp"
 #include "dag.hpp"
 
-void test_convert_dependencies() {
+void _test_convert_dependencies() {
     {
         // Single item without dependencies
         std::vector<std::string> lines;
@@ -27,25 +27,41 @@ void test_convert_dependencies() {
     }
 }
 
-/*void test_add_single_dependency() {
-    // Create dependencies for test
-    dag::Dependency deps[] = { dag::Dependency("a", "b") };
+void _test_add_standalone_node() {
+    // Create dependencies for test with no downstream
+    dag::Dependency deps[] = { dag::Dependency { "a" } };
     std::vector<dag::Dependency> dependencies(std::begin(deps), std::end(deps));
-    std::vector<std::shared_ptr<dag::DagNode>> nodes;
+    std::vector<std::shared_ptr<dag::DagNode>> startNodes;
     // Build dag
-    dag::build_dag(&dependencies, &nodes);
+    dag::build_dag(&dependencies, &startNodes);
+
+    std::cout << "Dependency \"" << deps[0].name << "\" count: " << deps[0].used << std::endl;
+
+    // The dependency should be marked as used
+    assert(deps[0].used == 1);
+    // The dag should consist of the node 'a'
+    assert(get_node_count(*startNodes[0]) == 1);
+}
+
+void _test_add_single_dependency() {
+    // Create dependencies for test
+    dag::Dependency deps[] = { dag::Dependency { "a", "b" } };
+    std::vector<dag::Dependency> dependencies(std::begin(deps), std::end(deps));
+    std::vector<std::shared_ptr<dag::DagNode>> startNodes;
+    // Build dag
+    dag::build_dag(&dependencies, &startNodes);
     // Only one dag should be generated
-    assert(nodes.size() == 1);
-    // Count nodes
-    std::set<std::string> accumulator; 
-    dag::count_nodes(nodes[0], accumulator);
+    assert(startNodes.size() == 1);
+    assert(deps[0].used == 1);
+
     // The dag should consist of the two nodes 'a' and 'b'
-    assert(accumulator.size() == 2);
-}*/
+    //assert(*get_node_count(nodes[0]) == 2)
+}
 
 void run_all_tests() {
     std::cout << "Running tests" << std::endl;
-    test_convert_dependencies();
+    _test_convert_dependencies();
+    _test_add_standalone_node();
     //test_add_single_dependency();
     std::cout << "All tests complete" << std::endl;
 }

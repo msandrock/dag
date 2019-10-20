@@ -47,11 +47,11 @@ namespace dag {
     /**
      * Loop over all dependencies and find the upstream node
      */
-    void find_upstream_dependency(Dependency* current, std::vector<Dependency>* dependencies, Dependency** found) {
+    void _find_upstream_dependency(const Dependency& current, std::vector<Dependency>* dependencies, Dependency** found) {
         // TODO: Maybe add support to find multiple ancestors?
         int i = 0;
         for (auto dependency: *dependencies) {
-            if (dependency.downstream == current->name) {
+            if (dependency.downstream == current.name) {
                 // Obtain pointer into vector
                 *found = &(dependencies->data()[i]);
                 return;
@@ -72,7 +72,7 @@ namespace dag {
             }
 
             Dependency* ancestor = nullptr;
-            find_upstream_dependency(&dependency, dependencies, &ancestor);
+            _find_upstream_dependency(dependency, dependencies, &ancestor);
 
             // Dependency has no ancestor
             if (ancestor == nullptr) {
@@ -98,15 +98,39 @@ namespace dag {
      */ 
     void build_dag(std::vector<Dependency>* dependencies, std::vector<std::shared_ptr<DagNode>>* startNodes) {
         // 1. Every node that is not a child node is automatically a start node
+        for (auto iterator = dependencies->begin(); iterator != dependencies->end(); iterator++) {
+            Dependency* upstream = nullptr;
+            _find_upstream_dependency(*iterator, dependencies, &upstream);
+            
+            if (upstream == nullptr) {
+                std::shared_ptr<DagNode> startNode(new DagNode(iterator->name));
+                startNodes->push_back(startNode);
+                // Set the use flag, if the dependency has no downstreams
+                if (iterator->downstream == "") {
+                    std::cout << "Mark node " << iterator->name << " as used" << std::endl;
+                    (*iterator).used = 1;
+                }
+            }
+        }
+
+        /*
+        int i = 0;
         for (auto dependency: *dependencies) {
             Dependency* ancestor = nullptr;
-            find_upstream_dependency(&dependency, dependencies, &ancestor);
+            _find_upstream_dependency(dependency, dependencies, &ancestor);
             
             if (ancestor == nullptr) {
                 std::shared_ptr<DagNode> startNode(new DagNode(dependency.name));
                 startNodes->push_back(startNode);
+                // Set the use flag, if the dependency has no downstreams
+                if (dependency.downstream == "") {
+                    std::cout << "Mark node " << dependency.name << " as used" << std::endl;
+                    (*dependency).used++;
+                }
             }
-        }
+
+            i++;
+        }*/
 
         // When adding nodes to the dag, the dependencies have to be flagged
         // If the downstream node is not an upstream dependency to another node, add it as a standalone node
@@ -124,15 +148,25 @@ namespace dag {
     }
 
     /**
+     * Recursively count the number of nodes in the dag
+     */
+    void _count_nodes(const DagNode& node, std::set<std::string>& accumulator) {
+        // If the node is already in the set, do not add it again
+        accumulator.insert(node.getName());
+
+        for (auto child: node.children) {
+            _count_nodes(*child, accumulator);
+        }
+    }
+
+    /**
      * Count the number of nodes in the dag
      */
-    void count_nodes(std::shared_ptr<DagNode> node, std::set<std::string>& accumulator) {
-        // If the node is already in the set, do not add it again
-        accumulator.insert(node->getName());
+    size_t get_node_count(const DagNode& node) {
+        std::set<std::string> accumulator; 
+        _count_nodes(node, accumulator);
 
-        for (auto child: node->children) {
-            count_nodes(child, accumulator);
-        }
+        return accumulator.size();
     }
 
     /**

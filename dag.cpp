@@ -74,7 +74,8 @@ namespace dag {
             }
         }
 
-        // No further dependencies for upstream dependency - add leaf node
+        // If we reach this point, then there are no further dependencies for upstream dependency
+        // - add leaf node
         std::shared_ptr<DagNode> downstreamNode(new DagNode(upstreamDependency.downstream));
         node->children.push_back(downstreamNode);
         downstreamNode->ancestors.push_back(node);
@@ -86,55 +87,71 @@ namespace dag {
     /**
      * Append direct child nodes to the current node
      */ 
-    void _append_child_nodes(std::shared_ptr<DagNode> currentNode, std::vector<Dependency>* dependencies) {
+    void _append_child_nodes(std::shared_ptr<DagNode> parentNode, std::vector<Dependency>* dependencies) {
         // Find all dependencies that have the current node as a parent
+        int i = 0;
         for (auto dependency: *dependencies) {
-            // No self-referencing
-            //if (dependency.name == currentNode->getName()) {
-            //    continue;
-            //}
+            if (dependency.used) {
+                continue; // Dependency alredy processed
+            }
 
             // Find upstream node that points to the current dependency
             Dependency* upstream = nullptr;
+            bool leafAdded = false;
             _find_upstream_dependency(dependency, dependencies, &upstream);
 
-            if (dependency.name == currentNode->getName() && dependency.downstream != "") {
-                // Check if the downstream has downstream dependencies
-                _append_leaf_node(currentNode, dependencies, dependency);
+            if (dependency.name == parentNode->name && dependency.downstream != "") {
+                // Check if we need to add the current downstream as a leaf node 
+                leafAdded = _append_leaf_node(parentNode, dependencies, dependency);
+
+                if (leafAdded) {
+                    (*dependencies).data()[i].used++;
+                }
             }
 
             // Dependency has no ancestor - it's a root dependency
-            if (upstream == nullptr) {
+            if (upstream == nullptr || upstream->name != parentNode->name) {
+                i++;
                 continue;
             }
 
-            /*
-            currentNode = a
-            upstream = a>b -> ignored - upstream is null
-            upstream = b>c
-            */
-
-            if (upstream->name == currentNode->getName()) {
-                // Add the current dependency as a child node
-                std::shared_ptr<DagNode> newNode(new DagNode(dependency.name));
-                //std::cout << "Add " << newNode->getName() << " to " << currentNode->getName() << std::endl;
-
-                // If the downstream node is not an upstream dependency to another node, add it as a standalone node
-                // Find nodes that have the downstream node as a dependency
-                // e.g. a>b - b is not a dependency of any other node - add it as standalone
-                // Find nodes that have 'c' as a parent
-
-                //std::cout << "Fing downstream nodes to " << dependency.downstream << std::endl;
-                if (!_append_leaf_node(newNode, dependencies, dependency)) {
-                    //std::cout << "Node " << dependency.downstream << " is a dependency" << std::endl;
-                    // Other nodes are referencing the downstream dependency - enter recursion
-                    _append_child_nodes(newNode, dependencies);
+            // Check if the current node has a child node for the given upstream yet
+            std::shared_ptr<DagNode> childNode = nullptr;
+            bool nodeExists = false;
+            for (auto child: parentNode->children) {
+                if (child->name == dependency.name) {
+                    // Node already has a child node with the same name
+                    childNode = child;
+                    nodeExists = true;
                 }
-
-                // When adding nodes to the dag, the dependencies have to be flagged
-                currentNode->children.push_back(newNode);
-                newNode->ancestors.push_back(currentNode);
             }
+
+            if (childNode == nullptr) {
+                childNode = std::shared_ptr<DagNode>(new DagNode(dependency.name));
+            }
+
+            // If the downstream node is not an upstream dependency to another node, add it as a standalone node
+            // Find nodes that have the downstream node as a dependency
+            // e.g. a>b - b is not a dependency of any other node - add it as standalone
+            // Find nodes that have 'c' as a parent
+
+            if (!leafAdded) {
+                leafAdded = _append_leaf_node(childNode, dependencies, dependency);
+            }
+
+            if (!leafAdded) {
+                // Other nodes are referencing the downstream dependency - enter recursion
+                _append_child_nodes(childNode, dependencies);
+            }
+
+            // Append new node to parent
+            if (!nodeExists) {
+                parentNode->children.push_back(childNode);
+                childNode->ancestors.push_back(parentNode);
+            }
+
+            (*dependencies).data()[i].used++;
+            i++;
         }
     }
     
@@ -175,7 +192,7 @@ namespace dag {
      */
     void _count_nodes(const DagNode& node, std::set<std::string>& accumulator) {
         // If the node is already in the set, do not add it again
-        accumulator.insert(node.getName());
+        accumulator.insert(node.name);
 
         for (auto child: node.children) {
             _count_nodes(*child, accumulator);
@@ -196,7 +213,7 @@ namespace dag {
      * Print a text representation of the dag
      */
     void print_nodes(std::shared_ptr<DagNode> node, int level) {
-        std::cout << std::string(level, '\t') << node->getName() << "[" << node->children.size() << "]" << std::endl;
+        std::cout << std::string(level, '\t') << node->name << "[" << node->children.size() << "]" << std::endl;
         for (auto childNode: node->children) {
             print_nodes(childNode, level + 1);
         }

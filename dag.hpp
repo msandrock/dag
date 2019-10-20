@@ -17,7 +17,6 @@ namespace dag {
         std::vector<std::shared_ptr<DagNode>> children;
 
         DagNode(const std::string& name);
-        std::string getName() const { return name; }
     };
 
     Dependency convert_dependency(const std::string& line);

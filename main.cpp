@@ -93,8 +93,8 @@ int main(int argc, const char** argv) {
         print_nodes(startNode, 0);
     }
 
-    write_svg(startNodes, "dag.svg");
-    system("open dag.svg");
+    //write_svg(startNodes, "dag.svg");
+    //system("open dag.svg");
 
     return EXIT_SUCCESS;
 } 

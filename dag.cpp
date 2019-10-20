@@ -45,10 +45,11 @@ namespace dag {
     }
 
     /**
-     * Loop over all dependencies and find the upstream node
+     * Loop over all dependencies and find the upstream node; Returns a pointer to the found node that references the dependency
      */
     void _find_upstream_dependency(const Dependency& current, std::vector<Dependency>* dependencies, Dependency** found) {
         // TODO: Maybe add support to find multiple ancestors?
+        *found = nullptr;
         int i = 0;
         for (auto dependency: *dependencies) {
             if (dependency.downstream == current.name) {
@@ -63,7 +64,7 @@ namespace dag {
     /**
      * Append direct child nodes to the current node
      */ 
-    void append_dependencies(std::shared_ptr<DagNode> currentNode, std::vector<Dependency>* dependencies) {
+    void _append_dependencies(std::shared_ptr<DagNode> currentNode, std::vector<Dependency>* dependencies) {
         // Find all dependencies that have the current node as a parent
         for (auto dependency: *dependencies) {
             // No self-referencing
@@ -71,24 +72,74 @@ namespace dag {
             //    continue;
             //}
 
-            Dependency* ancestor = nullptr;
-            _find_upstream_dependency(dependency, dependencies, &ancestor);
+            // Find upstream node that points to the current dependency
+            Dependency* upstream = nullptr;
+            _find_upstream_dependency(dependency, dependencies, &upstream);
 
-            // Dependency has no ancestor
-            if (ancestor == nullptr) {
+            if (dependency.name == currentNode->getName() && dependency.downstream != "") {
+                // TODO: Refactor this block to a "insert_leaf_node" function
+
+                // Check if the downstream has downstream dependencies
+                bool found = false;
+                for (auto downstreamDependency: *dependencies) {
+                    if (downstreamDependency.name == dependency.downstream && downstreamDependency.downstream != "") {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    std::shared_ptr<DagNode> downstreamNode(new DagNode(dependency.downstream));
+                    std::cout << "Add " << downstreamNode->getName() << " to " << currentNode->getName() << std::endl;
+                    currentNode->children.push_back(downstreamNode);
+                    downstreamNode->ancestors.push_back(currentNode);
+                }
+            }
+
+            // Dependency has no ancestor - it's a root dependency
+            if (upstream == nullptr) {
                 continue;
             }
 
-            // Is the upstream node ancestor to the current node?
-            if (ancestor->name == currentNode->getName()) {
+            /*
+            currentNode = a
+            upstream = a>b -> ignored - upstream is null
+            upstream = b>c
+            */
+
+            if (upstream->name == currentNode->getName()) {
                 // Add the current dependency as a child node
                 std::shared_ptr<DagNode> newNode(new DagNode(dependency.name));
                 std::cout << "Add " << newNode->getName() << " to " << currentNode->getName() << std::endl;
 
+                // If the downstream node is not an upstream dependency to another node, add it as a standalone node
+                // Find nodes that have the downstream node as a dependency
+                // e.g. a>b - b is not a dependency of any other node - add it as standalone
+                // Find nodes that have 'c' as a parent
+
+                std::cout << "Fing downstream nodes to " << dependency.downstream << std::endl;
+                bool found = false;
+                for (auto downstreamDependency: *dependencies) {
+                    if (downstreamDependency.name == dependency.downstream && downstreamDependency.downstream != "") {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    std::shared_ptr<DagNode> downstreamNode(new DagNode(dependency.downstream));
+                    std::cout << "Add " << downstreamNode->getName() << " to " << newNode->getName() << std::endl;
+                    newNode->children.push_back(downstreamNode);
+                    downstreamNode->ancestors.push_back(newNode);
+                } else {
+                    std::cout << "Node " << dependency.downstream << " is a dependency" << std::endl;
+                    // Other nodes are referencing the downstream dependency - enter recursion
+                    _append_dependencies(newNode, dependencies);
+                }
+
+                // When adding nodes to the dag, the dependencies have to be flagged
                 currentNode->children.push_back(newNode);
                 newNode->ancestors.push_back(currentNode);
-
-                append_dependencies(newNode, dependencies);
             }
         }
     }
@@ -115,16 +166,11 @@ namespace dag {
             i++;
         }
 
-        // When adding nodes to the dag, the dependencies have to be flagged
-        // If the downstream node is not an upstream dependency to another node, add it as a standalone node
-        // Find nodes that have the downstream node as a dependency
-        // e.g. a>b - b is not a dependency of any other node - add it as standalone
-
         // Construct dags for all start nodes
         for (auto startNode: *startNodes) {
             // Pass in the current dag - add all nodes to the end nodes
             // dag, current node, dependencies
-            append_dependencies(startNode, dependencies);
+            _append_dependencies(startNode, dependencies);
         }
 
         // 2. Every node that references an ancestor node is invalid

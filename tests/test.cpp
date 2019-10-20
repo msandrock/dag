@@ -50,10 +50,13 @@ void _test_add_single_dependency() {
     dag::build_dag(&dependencies, &startNodes);
     // Only one dag should be generated
     assert(startNodes.size() == 1);
-    assert(dependencies[0].used == 1);
+    //assert(dependencies[0].used == 1);
 
     // The dag should consist of the two nodes 'a' and 'b'
-    //assert(*get_node_count(nodes[0]) == 2)
+    const size_t nodeCount = get_node_count(*startNodes[0]);
+    std::cout << "Node count: " << nodeCount << std::endl;
+
+    assert(get_node_count(*startNodes[0]) == 2);
 }
 
 void run_all_tests() {

@@ -12,7 +12,7 @@
 #include "svg.hpp"
 
 #ifdef TEST
-#include "test.hpp"
+#include "tests/test.hpp"
 #endif
 
 /**

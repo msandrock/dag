@@ -4,7 +4,7 @@
 #include <set>
 #include <vector>
 #include "test.hpp"
-#include "dag.hpp"
+#include "../dag.hpp"
 
 void _test_convert_dependencies() {
     {

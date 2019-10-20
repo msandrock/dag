@@ -9,10 +9,10 @@ CFLAGS  = -std=c++17 -Wall -g -DVERSION=\"$(VERSION)\" -Werror #-Wmissing-protot
 
 all: $(BINARY)
 
-${BINARY}: src/*.cpp
+${BINARY}: *.cpp
 	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
 
-${TEST_BINARY}: src/*.cpp
+${TEST_BINARY}: *.cpp tests/*.cpp
 	$(CC) $(CFLAGS) -DTEST=1 -o $@ $^ $(LFLAGS)
 
 clean:

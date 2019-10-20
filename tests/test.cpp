@@ -25,6 +25,20 @@ void _test_convert_dependencies() {
         assert(dependencies[0].name == "a");
         assert(dependencies[0].downstream == "b");
     }
+    {
+        // Ignore empty lines and comments
+        std::vector<std::string> lines;
+        lines.push_back("a>b");
+        lines.push_back("");
+        lines.push_back("# Just a comment");
+        lines.push_back("b>c");
+        auto dependencies = dag::convert_dependencies(lines);
+        assert(dependencies.size() == 2);
+        assert(dependencies[0].name == "a");
+        assert(dependencies[0].downstream == "b");
+        assert(dependencies[1].name == "b");
+        assert(dependencies[1].downstream == "c");
+    }
 }
 
 void _test_add_standalone_node() {

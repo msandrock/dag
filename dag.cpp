@@ -37,6 +37,9 @@ namespace dag {
         std::vector<Dependency> dependencies;
 
         for (auto line: lines) {
+            // Ignore empty lines and comments
+            if (line == "" || line[0] == '#') continue;
+
             auto dependency = convert_dependency(line);
             dependencies.push_back(dependency);
         }
@@ -91,9 +94,7 @@ namespace dag {
         // Find all dependencies that have the current node as a parent
         int i = 0;
         for (auto dependency: *dependencies) {
-            if (dependency.used) {
-                continue; // Dependency alredy processed
-            }
+            if (dependency.used) continue;
 
             // Find upstream node that points to the current dependency
             Dependency* upstream = nullptr;

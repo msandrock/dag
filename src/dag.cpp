@@ -98,39 +98,22 @@ namespace dag {
      */ 
     void build_dag(std::vector<Dependency>* dependencies, std::vector<std::shared_ptr<DagNode>>* startNodes) {
         // 1. Every node that is not a child node is automatically a start node
-        for (auto iterator = dependencies->begin(); iterator != dependencies->end(); iterator++) {
-            Dependency* upstream = nullptr;
-            _find_upstream_dependency(*iterator, dependencies, &upstream);
-            
-            if (upstream == nullptr) {
-                std::shared_ptr<DagNode> startNode(new DagNode(iterator->name));
-                startNodes->push_back(startNode);
-                // Set the use flag, if the dependency has no downstreams
-                if (iterator->downstream == "") {
-                    std::cout << "Mark node " << iterator->name << " as used" << std::endl;
-                    (*iterator).used = 1;
-                }
-            }
-        }
-
-        /*
         int i = 0;
         for (auto dependency: *dependencies) {
-            Dependency* ancestor = nullptr;
-            _find_upstream_dependency(dependency, dependencies, &ancestor);
+            Dependency* upstream = nullptr;
+            _find_upstream_dependency(dependency, dependencies, &upstream);
             
-            if (ancestor == nullptr) {
+            if (upstream == nullptr) {
                 std::shared_ptr<DagNode> startNode(new DagNode(dependency.name));
                 startNodes->push_back(startNode);
                 // Set the use flag, if the dependency has no downstreams
                 if (dependency.downstream == "") {
-                    std::cout << "Mark node " << dependency.name << " as used" << std::endl;
-                    (*dependency).used++;
+                    dependencies->data()[i].used = 1;
                 }
             }
 
             i++;
-        }*/
+        }
 
         // When adding nodes to the dag, the dependencies have to be flagged
         // If the downstream node is not an upstream dependency to another node, add it as a standalone node

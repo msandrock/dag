@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DAG_HPP
+#define DAG_HPP
 #include <set>
 #include <string>
 #include <vector>
@@ -26,3 +27,4 @@ namespace dag {
     size_t get_node_count(const DagNode& node);
     void print_nodes(std::shared_ptr<DagNode> node, int level);
 }
+#endif

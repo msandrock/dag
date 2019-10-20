@@ -1,4 +1,5 @@
-#pragma once
+#ifndef STDAFX_HPP
+#define STDAFX_HPP
 #include <algorithm> 
 #include <cctype>
 #include <exception>    // std::exception
@@ -80,3 +81,4 @@ static inline std::string trim_copy(std::string s) {
     trim(s);
     return s;
 }
+#endif

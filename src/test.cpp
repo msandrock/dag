@@ -34,11 +34,8 @@ void _test_add_standalone_node() {
     std::vector<std::shared_ptr<dag::DagNode>> startNodes;
     // Build dag
     dag::build_dag(&dependencies, &startNodes);
-
-    std::cout << "Dependency \"" << deps[0].name << "\" count: " << deps[0].used << std::endl;
-
     // The dependency should be marked as used
-    assert(deps[0].used == 1);
+    assert(dependencies[0].used == 1);
     // The dag should consist of the node 'a'
     assert(get_node_count(*startNodes[0]) == 1);
 }

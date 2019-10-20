@@ -53,10 +53,29 @@ void _test_add_single_dependency() {
     //assert(dependencies[0].used == 1);
 
     // The dag should consist of the two nodes 'a' and 'b'
-    const size_t nodeCount = get_node_count(*startNodes[0]);
-    std::cout << "Node count: " << nodeCount << std::endl;
-
+    //const size_t nodeCount = get_node_count(*startNodes[0]);
+    //std::cout << "Node count: " << nodeCount << std::endl;
     assert(get_node_count(*startNodes[0]) == 2);
+}
+
+void _test_add_double_dependency() {
+    // Create dependencies for test
+    dag::Dependency deps[] = {
+        dag::Dependency { "a", "b" },
+        dag::Dependency { "b", "c" }
+    };
+    std::vector<dag::Dependency> dependencies(std::begin(deps), std::end(deps));
+    std::vector<std::shared_ptr<dag::DagNode>> startNodes;
+    // Build dag
+    dag::build_dag(&dependencies, &startNodes);
+    // Only one dag should be generated
+    assert(startNodes.size() == 1);
+    //assert(dependencies[0].used == 1);
+
+    // The dag should consist of the two nodes 'a' and 'b'
+    //const size_t nodeCount = get_node_count(*startNodes[0]);
+    //std::cout << "Node count: " << nodeCount << std::endl;
+    assert(get_node_count(*startNodes[0]) == 3);
 }
 
 void run_all_tests() {
@@ -64,5 +83,6 @@ void run_all_tests() {
     _test_convert_dependencies();
     _test_add_standalone_node();
     _test_add_single_dependency();
+    _test_add_double_dependency();
     std::cout << "All tests complete" << std::endl;
 }

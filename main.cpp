@@ -80,9 +80,13 @@ int main(int argc, const char** argv) {
         return EXIT_FAILURE;
     }
 
+    std::cout << "#########" << std::endl;
+    std::cout << "# Lines #" << std::endl;
+    std::cout << "#########" << std::endl << std::endl;
     for (auto line: lines) {
         std::cout << "Line: " << line << std::endl;
     }
+    std::cout << std::endl;
 
     // Convert parsed lines to dependency structs
     std::vector<dag::Dependency> dependencies = dag::convert_dependencies(lines);
@@ -90,11 +94,14 @@ int main(int argc, const char** argv) {
     build_dag(&dependencies, &startNodes);
 
     for (auto startNode: startNodes) {
+        std::cout << "#######" << std::endl;
+        std::cout << "# DAG #" << std::endl;
+        std::cout << "#######" << std::endl;
         print_nodes(startNode, 0);
     }
+    std::cout << std::endl;
 
     //write_svg(startNodes, "dag.svg");
     //system("open dag.svg");
-
     return EXIT_SUCCESS;
 } 

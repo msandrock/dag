@@ -90,7 +90,7 @@ namespace dag {
 
                 if (!found) {
                     std::shared_ptr<DagNode> downstreamNode(new DagNode(dependency.downstream));
-                    std::cout << "Add " << downstreamNode->getName() << " to " << currentNode->getName() << std::endl;
+                    //std::cout << "Add " << downstreamNode->getName() << " to " << currentNode->getName() << std::endl;
                     currentNode->children.push_back(downstreamNode);
                     downstreamNode->ancestors.push_back(currentNode);
                 }
@@ -110,14 +110,14 @@ namespace dag {
             if (upstream->name == currentNode->getName()) {
                 // Add the current dependency as a child node
                 std::shared_ptr<DagNode> newNode(new DagNode(dependency.name));
-                std::cout << "Add " << newNode->getName() << " to " << currentNode->getName() << std::endl;
+                //std::cout << "Add " << newNode->getName() << " to " << currentNode->getName() << std::endl;
 
                 // If the downstream node is not an upstream dependency to another node, add it as a standalone node
                 // Find nodes that have the downstream node as a dependency
                 // e.g. a>b - b is not a dependency of any other node - add it as standalone
                 // Find nodes that have 'c' as a parent
 
-                std::cout << "Fing downstream nodes to " << dependency.downstream << std::endl;
+                //std::cout << "Fing downstream nodes to " << dependency.downstream << std::endl;
                 bool found = false;
                 for (auto downstreamDependency: *dependencies) {
                     if (downstreamDependency.name == dependency.downstream && downstreamDependency.downstream != "") {
@@ -128,11 +128,11 @@ namespace dag {
 
                 if (!found) {
                     std::shared_ptr<DagNode> downstreamNode(new DagNode(dependency.downstream));
-                    std::cout << "Add " << downstreamNode->getName() << " to " << newNode->getName() << std::endl;
+                    //std::cout << "Add " << downstreamNode->getName() << " to " << newNode->getName() << std::endl;
                     newNode->children.push_back(downstreamNode);
                     downstreamNode->ancestors.push_back(newNode);
                 } else {
-                    std::cout << "Node " << dependency.downstream << " is a dependency" << std::endl;
+                    //std::cout << "Node " << dependency.downstream << " is a dependency" << std::endl;
                     // Other nodes are referencing the downstream dependency - enter recursion
                     _append_dependencies(newNode, dependencies);
                 }
@@ -202,9 +202,7 @@ namespace dag {
      * Print a text representation of the dag
      */
     void print_nodes(std::shared_ptr<DagNode> node, int level) {
-        std::cout << std::string(level, '\t') << node->getName() << std::endl;
-        std::cout << "downstream nodes: " << node->children.size() << std::endl;
-
+        std::cout << std::string(level, '\t') << node->getName() << "[" << node->children.size() << "]" << std::endl;
         for (auto childNode: node->children) {
             print_nodes(childNode, level + 1);
         }

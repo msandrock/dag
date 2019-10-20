@@ -62,9 +62,31 @@ namespace dag {
     }
 
     /**
+     * Add leaf node, if no other dependencies require the given node
+     */
+    bool _append_leaf_node(std::shared_ptr<DagNode> node, std::vector<Dependency>* dependencies, const Dependency& upstreamDependency) {
+        // Find a dependency that has the given dependency as a downstream
+        for (auto dependency: *dependencies) {
+            // Is downstream to given dependency and has further downstreams
+            if (dependency.name == upstreamDependency.downstream && dependency.downstream != "") {
+                // No leaf added - return false
+                return false;
+            }
+        }
+
+        // No further dependencies for upstream dependency - add leaf node
+        std::shared_ptr<DagNode> downstreamNode(new DagNode(upstreamDependency.downstream));
+        node->children.push_back(downstreamNode);
+        downstreamNode->ancestors.push_back(node);
+
+        // Leaf added - return true
+        return true;
+    }
+
+    /**
      * Append direct child nodes to the current node
      */ 
-    void _append_dependencies(std::shared_ptr<DagNode> currentNode, std::vector<Dependency>* dependencies) {
+    void _append_child_nodes(std::shared_ptr<DagNode> currentNode, std::vector<Dependency>* dependencies) {
         // Find all dependencies that have the current node as a parent
         for (auto dependency: *dependencies) {
             // No self-referencing
@@ -77,23 +99,8 @@ namespace dag {
             _find_upstream_dependency(dependency, dependencies, &upstream);
 
             if (dependency.name == currentNode->getName() && dependency.downstream != "") {
-                // TODO: Refactor this block to a "insert_leaf_node" function
-
                 // Check if the downstream has downstream dependencies
-                bool found = false;
-                for (auto downstreamDependency: *dependencies) {
-                    if (downstreamDependency.name == dependency.downstream && downstreamDependency.downstream != "") {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    std::shared_ptr<DagNode> downstreamNode(new DagNode(dependency.downstream));
-                    //std::cout << "Add " << downstreamNode->getName() << " to " << currentNode->getName() << std::endl;
-                    currentNode->children.push_back(downstreamNode);
-                    downstreamNode->ancestors.push_back(currentNode);
-                }
+                _append_leaf_node(currentNode, dependencies, dependency);
             }
 
             // Dependency has no ancestor - it's a root dependency
@@ -118,23 +125,10 @@ namespace dag {
                 // Find nodes that have 'c' as a parent
 
                 //std::cout << "Fing downstream nodes to " << dependency.downstream << std::endl;
-                bool found = false;
-                for (auto downstreamDependency: *dependencies) {
-                    if (downstreamDependency.name == dependency.downstream && downstreamDependency.downstream != "") {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    std::shared_ptr<DagNode> downstreamNode(new DagNode(dependency.downstream));
-                    //std::cout << "Add " << downstreamNode->getName() << " to " << newNode->getName() << std::endl;
-                    newNode->children.push_back(downstreamNode);
-                    downstreamNode->ancestors.push_back(newNode);
-                } else {
+                if (!_append_leaf_node(newNode, dependencies, dependency)) {
                     //std::cout << "Node " << dependency.downstream << " is a dependency" << std::endl;
                     // Other nodes are referencing the downstream dependency - enter recursion
-                    _append_dependencies(newNode, dependencies);
+                    _append_child_nodes(newNode, dependencies);
                 }
 
                 // When adding nodes to the dag, the dependencies have to be flagged
@@ -170,7 +164,7 @@ namespace dag {
         for (auto startNode: *startNodes) {
             // Pass in the current dag - add all nodes to the end nodes
             // dag, current node, dependencies
-            _append_dependencies(startNode, dependencies);
+            _append_child_nodes(startNode, dependencies);
         }
 
         // 2. Every node that references an ancestor node is invalid

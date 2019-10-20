@@ -6,7 +6,8 @@
 namespace dag {
     struct Dependency {
         std::string name;
-        std::set<std::string> downstreams;
+        std::string downstream;
+        int used;
     };
 
     struct DagNode {
@@ -20,6 +21,7 @@ namespace dag {
 
     Dependency convert_dependency(const std::string& line);
     std::vector<Dependency> convert_dependencies(const std::vector<std::string>& lines);
+    void append_dependencies(std::shared_ptr<DagNode> currentNode, std::vector<Dependency>* dependencies);
     void build_dag(std::vector<Dependency>* dependencies, std::vector<std::shared_ptr<DagNode>>* startNodes);
     void count_nodes(std::shared_ptr<DagNode> node, std::set<std::string>& accumulator);
     void print_nodes(std::shared_ptr<DagNode> node, int level);

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <set>
 #include <string>
 #include <vector>
 #include "dag.hpp"
@@ -15,14 +16,15 @@ namespace dag {
      * Convert single line to dependency
      */
     Dependency convert_dependency(const std::string& line) {
-        // Convert to dependency struct
-        Dependency dependency = { line };
+        Dependency dependency{};
         const auto pos = line.find('>');
 
         if (pos != std::string::npos) {
             // Item has a child dependency
             dependency.name = line.substr(0, pos);
-            dependency.downstreams.insert(line.substr(pos + 1));
+            dependency.downstream = line.substr(pos + 1);
+        } else {
+            dependency.name = line;
         }
 
         return dependency;
@@ -37,19 +39,7 @@ namespace dag {
         for (auto line: lines) {
             auto dependency = convert_dependency(line);
             dependencies.push_back(dependency);
-
-            // If the downstream node is not an upstream dependency to another node, add it as a standalone node
-            // Find nodes that have the downstream node as a dependency
-            // e.g. a>b - b is not a dependency of any other node - add it as standalone
         }
-
-        // TODO: Merge and unify dependencies
-        // a>b
-        // a>c
-        // --> a>b+c
-        
-        // Downstream nodes need to be an array
-
 
         return dependencies;
     }
@@ -61,13 +51,10 @@ namespace dag {
         // TODO: Maybe add support to find multiple ancestors?
         int i = 0;
         for (auto dependency: *dependencies) {
-            // Loop over all downstream dependencies
-            for (auto downstream: dependency.downstreams) {
-                if (downstream == current->name) {
-                    // Obtain pointer into vector
-                    *found = &(dependencies->data()[i]);
-                    return;
-                }
+            if (dependency.downstream == current->name) {
+                // Obtain pointer into vector
+                *found = &(dependencies->data()[i]);
+                return;
             }
             i++;
         }
@@ -121,10 +108,10 @@ namespace dag {
             }
         }
 
-        // TODO:
-        // Every dependency defines a relation between two nodes
-        // All dependencies have to be consumed, to complete the DAG
-        // When adding nodes to the dag, the dependencies have to be removed from a set
+        // When adding nodes to the dag, the dependencies have to be flagged
+        // If the downstream node is not an upstream dependency to another node, add it as a standalone node
+        // Find nodes that have the downstream node as a dependency
+        // e.g. a>b - b is not a dependency of any other node - add it as standalone
 
         // Construct dags for all start nodes
         for (auto startNode: *startNodes) {

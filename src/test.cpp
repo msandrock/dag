@@ -14,13 +14,16 @@ void test_convert_dependencies() {
         auto dependencies = dag::convert_dependencies(lines);
         assert(dependencies.size() == 1);
         assert(dependencies[0].name == "a");
-        assert(dependencies[0].downstreams.size() == 0);
+        assert(dependencies[0].downstream == "");
+        assert(dependencies[0].used == 0);
     }
     {
         std::vector<std::string> lines;
         lines.push_back("a>b");
         auto dependencies = dag::convert_dependencies(lines);
-        assert(dependencies.size() == 2);
+        assert(dependencies.size() == 1);
+        assert(dependencies[0].name == "a");
+        assert(dependencies[0].downstream == "b");
     }
 }
 

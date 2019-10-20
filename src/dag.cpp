@@ -64,12 +64,12 @@ namespace dag {
      * Append direct child nodes to the current node
      */ 
     void append_dependencies(std::shared_ptr<DagNode> currentNode, std::vector<Dependency>* dependencies) {
-        // Find all nodes that have the current node as a parent
+        // Find all dependencies that have the current node as a parent
         for (auto dependency: *dependencies) {
             // No self-referencing
-            if (dependency.name == currentNode->getName()) {
-                continue;
-            }
+            //if (dependency.name == currentNode->getName()) {
+            //    continue;
+            //}
 
             Dependency* ancestor = nullptr;
             _find_upstream_dependency(dependency, dependencies, &ancestor);
@@ -108,7 +108,7 @@ namespace dag {
                 startNodes->push_back(startNode);
                 // Set the use flag, if the dependency has no downstreams
                 if (dependency.downstream == "") {
-                    dependencies->data()[i].used = 1;
+                    dependencies->data()[i].used++;
                 }
             }
 

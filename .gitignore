@@ -1,4 +1,5 @@
 dag
 dag_test
 *.dSYM
+*.svg
 notes.md

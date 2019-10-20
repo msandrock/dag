@@ -38,6 +38,7 @@ void _test_add_standalone_node() {
     assert(dependencies[0].used == 1);
     // The dag should consist of the node 'a'
     assert(get_node_count(*startNodes[0]) == 1);
+    assert(startNodes[0]->name == "a");
 }
 
 void _test_add_single_dependency() {
@@ -49,7 +50,7 @@ void _test_add_single_dependency() {
     dag::build_dag(&dependencies, &startNodes);
     // Only one dag should be generated
     assert(startNodes.size() == 1);
-    assert(deps[0].used == 1);
+    assert(dependencies[0].used == 1);
 
     // The dag should consist of the two nodes 'a' and 'b'
     //assert(*get_node_count(nodes[0]) == 2)
@@ -59,6 +60,6 @@ void run_all_tests() {
     std::cout << "Running tests" << std::endl;
     _test_convert_dependencies();
     _test_add_standalone_node();
-    //test_add_single_dependency();
+    _test_add_single_dependency();
     std::cout << "All tests complete" << std::endl;
 }

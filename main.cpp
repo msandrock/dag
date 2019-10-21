@@ -85,13 +85,13 @@ int main(int argc, const char** argv) {
     dag::node_vec startNodes;
     build_dag(dependencies, startNodes);
 
-    std::cout << "#######" << std::endl;
-    std::cout << "# DAG #" << std::endl;
-    std::cout << "#######" << std::endl;
-    print_nodes(startNodes); 
-    std::cout << std::endl;
+    //std::cout << "#######" << std::endl;
+    //std::cout << "# DAG #" << std::endl;
+    //std::cout << "#######" << std::endl;
+    //print_nodes(startNodes); 
+    //std::cout << std::endl;
 
-    write_svg(startNodes, "dag.svg");
-    system("open dag.svg");
+    write_svg(startNodes, "/tmp/dag.svg");
+    system("open /tmp/dag.svg");
     return EXIT_SUCCESS;
 } 

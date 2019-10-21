@@ -40,11 +40,13 @@ namespace dag {
      * Find a particular node in the dag
      */
     void _find_node(const std::string& needle, const node_vec& nodes, node_ptr* found) {
+        // Loop over all nodes
         for (auto node: nodes) {
+            // Is the current node the one we're looking for?
             if (node->name == needle) {
                 *found = node;
                 return;
-            };
+            }
 
             // Search in child nodes
             _find_node(needle, node->children, found);
@@ -166,17 +168,17 @@ namespace dag {
                 }
             }
 
+            if (!nodeExists) {
+                parentNode->children.push_back(childNode);
+                childNode->ancestors.push_back(parentNode);
+            }
+
             if (!leafAdded) {
                 // Other nodes are referencing the downstream dependency - enter recursion
                 _append_child_nodes(startNodes, childNode, dependencies);
             }
 
             // Append new node to parent
-            if (!nodeExists) {
-                parentNode->children.push_back(childNode);
-                childNode->ancestors.push_back(parentNode);
-            }
-
             dependencies.data()[i].used++;
             i++;
         }

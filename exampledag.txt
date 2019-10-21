@@ -1,18 +1,17 @@
-#a>b
-#b>c
-#c>d
-#b>e
+a>b
+b>c
+c>d
+b>e
 # Recombine d and e on f
-#d>f
-#e>f
+d>f
+e>f
 
-
-a > b
-a > c
-b > d
-c > d
-d > e
-d > f
+#a > b
+#a > c
+#b > d
+#c > d
+#d > e
+#d > f
 
 # It is okay, if we get two dags here  - needs merge during rendering
 #a>c

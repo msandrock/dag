@@ -85,12 +85,10 @@ int main(int argc, const char** argv) {
     dag::node_vec startNodes;
     build_dag(dependencies, startNodes);
 
-    for (auto startNode: startNodes) {
-        std::cout << "#######" << std::endl;
-        std::cout << "# DAG #" << std::endl;
-        std::cout << "#######" << std::endl;
-        print_nodes(startNode, 0);
-    }
+    std::cout << "#######" << std::endl;
+    std::cout << "# DAG #" << std::endl;
+    std::cout << "#######" << std::endl;
+    print_nodes(startNodes); 
     std::cout << std::endl;
 
     write_svg(startNodes, "dag.svg");

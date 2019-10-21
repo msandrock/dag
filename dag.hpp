@@ -31,6 +31,6 @@ namespace dag {
     std::vector<Dependency> convert_dependencies(const std::vector<std::string>& lines);
     void build_dag(dependency_vec& dependencies, node_vec& startNodes);
     size_t get_node_count(const node_vec& startNodes);
-    void print_nodes(node_ptr node, int level);
+    void print_nodes(node_vec nodes);
 }
 #endif

@@ -294,12 +294,22 @@ namespace dag {
     }
 
     /**
+     * Recursively print node and its child nodes
+     */
+    void _print_child_nodes(node_ptr node, int level) {
+        std::cout << std::string(level, '\t') << node->name << "[" << node->children.size() << "](" << node->x << "|" << node->y << ")" << std::endl;
+        
+        for (auto childNode: node->children) {
+            _print_child_nodes(childNode, level + 1);
+        }
+    }
+
+    /**
      * Print a text representation of the dag
      */
-    void print_nodes(node_ptr node, int level) {
-        std::cout << std::string(level, '\t') << node->name << "[" << node->children.size() << "](" << node->x << "|" << node->y << ")" << std::endl;
-        for (auto childNode: node->children) {
-            print_nodes(childNode, level + 1);
+    void print_nodes(node_vec nodes) {
+        for (auto node: nodes) {
+            _print_child_nodes(node, 0);
         }
     }
 }

@@ -76,17 +76,11 @@ namespace dag {
     /**
      * Loop over all dependencies and find the upstream node; Returns a pointer to the found node that references the dependency
      */
-    void _find_upstream_dependency(const Dependency& current, dependency_vec& dependencies, Dependency** found) {
-        // TODO: Maybe add support to find multiple ancestors?
-        *found = nullptr;
-        int i = 0;
+    void _find_upstream_dependencies(const Dependency& needle, dependency_vec& dependencies, dependency_vec& found) {
         for (auto dependency: dependencies) {
-            if (dependency.downstream == current.name) {
-                // Obtain pointer into vector
-                *found = &(dependencies.data()[i]);
-                return;
+            if (dependency.downstream == needle.name) {
+                found.push_back(dependency);
             }
-            i++;
         }
     }
 
@@ -128,12 +122,10 @@ namespace dag {
         // Find all dependencies that have the current node as a parent
         int i = 0;
         for (auto dependency: dependencies) {
-            if (dependency.used) continue;
-
-            // Find upstream node that points to the current dependency
-            Dependency* upstream = nullptr;
+            // Find upstream nodes that point to the current dependency
+            dependency_vec upstreams;
+            _find_upstream_dependencies(dependency, dependencies, upstreams);
             bool leafAdded = false;
-            _find_upstream_dependency(dependency, dependencies, &upstream);
 
             if (dependency.name == parentNode->name && dependency.downstream != "") {
                 // Check if we need to add the current downstream as a leaf node 
@@ -144,8 +136,17 @@ namespace dag {
                 }
             }
 
+            // Check if any of the upstreams points to the current node
+            bool hasMatchingUpstream = false;
+            for (auto upstream: upstreams) {
+                if (upstream.name == parentNode->name) {
+                    hasMatchingUpstream = true;
+                    break;
+                }
+            }
+
             // Dependency has no ancestor - it's a root dependency
-            if (upstream == nullptr || upstream->name != parentNode->name) {
+            if (!hasMatchingUpstream) {
                 i++;
                 continue;
             }
@@ -160,7 +161,7 @@ namespace dag {
                 childNode = std::make_shared<DagNode>(dependency.name);
             }
 
-            if (!leafAdded && !dependencies.data()[i].used) {
+            if (!leafAdded) {
                 leafAdded = _append_leaf_node(startNodes, childNode, dependencies, dependency);
 
                 if (leafAdded) {
@@ -168,17 +169,15 @@ namespace dag {
                 }
             }
 
-            if (!nodeExists) {
-                parentNode->children.push_back(childNode);
-                childNode->ancestors.push_back(parentNode);
-            }
+            // Append new node to parent
+            parentNode->children.push_back(childNode);
+            childNode->ancestors.push_back(parentNode);
 
             if (!leafAdded) {
                 // Other nodes are referencing the downstream dependency - enter recursion
                 _append_child_nodes(startNodes, childNode, dependencies);
             }
 
-            // Append new node to parent
             dependencies.data()[i].used++;
             i++;
         }
@@ -191,28 +190,31 @@ namespace dag {
         // 1. Every node that is not a child node is automatically a start node
         int i = 0;
         for (auto dependency: dependencies) {
-            Dependency* upstream = nullptr;
-            _find_upstream_dependency(dependency, dependencies, &upstream);
-            
-            if (upstream == nullptr) {
-                // We have two dependencies a>b and a>c - both qualify as start nodes. We only want to add one start node for 'a'
-                // Check if a start node with the same name exists, before adding a new one.
-                bool found = false;
-                for (auto node: startNodes) {
-                    if (node->name == dependency.name) {
-                        found = true;
-                    }
-                }
+            dependency_vec upstreams;
+            _find_upstream_dependencies(dependency, dependencies, upstreams);
+            // Dependency has upstream nodes - it's not a start node 
+            if (upstreams.size()) {
+                i++;
+                continue;
+            }
 
-                // Start node already added - skip
-                if (found) continue;
-                
-                node_ptr startNode = std::make_shared<DagNode>(dependency.name);
-                startNodes.push_back(startNode);
-                // Set the use flag, if the dependency has no downstreams
-                if (dependency.downstream == "") {
-                    dependencies.data()[i].used++;
+            // We have two dependencies a>b and a>c - both qualify as start nodes. We only want to add one start node for 'a'
+            // Check if a start node with the same name exists, before adding a new one.
+            bool found = false;
+            for (auto node: startNodes) {
+                if (node->name == dependency.name) {
+                    found = true;
                 }
+            }
+
+            // Start node already added - skip
+            if (found) continue;
+                
+            node_ptr startNode = std::make_shared<DagNode>(dependency.name);
+            startNodes.push_back(startNode);
+            // Set the use flag, if the dependency has no downstreams
+            if (dependency.downstream == "") {
+                dependencies.data()[i].used++;
             }
 
             i++;

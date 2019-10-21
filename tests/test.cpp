@@ -61,7 +61,7 @@ void _test_add_standalone_node() {
     // The dependency should be marked as used
     assert(dependencies[0].used == 1);
     // The dag should consist of the node 'a'
-    assert(get_node_count(*startNodes[0]) == 1);
+    assert(get_node_count(startNodes) == 1);
     assert(startNodes[0]->name == "a");
 }
 
@@ -77,9 +77,7 @@ void _test_add_single_dependency() {
     //assert(dependencies[0].used == 1);
 
     // The dag should consist of the two nodes 'a' and 'b'
-    //const size_t nodeCount = get_node_count(*startNodes[0]);
-    //std::cout << "Node count: " << nodeCount << std::endl;
-    assert(get_node_count(*startNodes[0]) == 2);
+    assert(get_node_count(startNodes) == 2);
 }
 
 void _test_add_double_dependency() {
@@ -96,10 +94,8 @@ void _test_add_double_dependency() {
     assert(startNodes.size() == 1);
     //assert(dependencies[0].used == 1);
 
-    // The dag should consist of the two nodes 'a' and 'b'
-    //const size_t nodeCount = get_node_count(*startNodes[0]);
-    //std::cout << "Node count: " << nodeCount << std::endl;
-    assert(get_node_count(*startNodes[0]) == 3);
+    // The dag should consist of the nodes 'a', 'b' and 'c'
+    assert(get_node_count(startNodes) == 3);
 }
 
 void _test_add_reversed_dependency() {
@@ -116,10 +112,8 @@ void _test_add_reversed_dependency() {
     assert(startNodes.size() == 1);
     //assert(dependencies[0].used == 1);
 
-    // The dag should consist of the two nodes 'a' and 'b'
-    //const size_t nodeCount = get_node_count(*startNodes[0]);
-    //std::cout << "Node count: " << nodeCount << std::endl;
-    assert(get_node_count(*startNodes[0]) == 3);
+    // The dag should consist of the nodes 'a', 'b' and 'c'
+    assert(get_node_count(startNodes) == 3);
 }
 
 void _test_dependency_recombine() {
@@ -146,8 +140,10 @@ void _test_dependency_recombine() {
     // Only one dag should be generated
     assert(startNodes.size() == 1);
     //assert(dependencies[0].used == 1);
-    assert(get_node_count(*startNodes[0]) == 4);
+    assert(get_node_count(startNodes) == 4);
 }
+
+// TODO: Write test for findnode
 
 void run_all_tests() {
     std::cout << "Running tests" << std::endl;

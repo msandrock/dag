@@ -20,16 +20,16 @@
  */
 void verify_format(const std::string& line, int lineNumber) {
     // Make sure there is exactly one '>'
-    //auto pos = line.find('>');
+    auto pos = line.find('>');
 
-    //if (pos == std::string::npos) {
-    //    throw ParseException("The line does not contain a '>'", line, lineNumber);
-    //}
+    if (pos == std::string::npos) {
+        return;
+    }
 
-    //// Make sure there are no additional '>'
-    //if (line.find('>', pos + 1) != std::string::npos) {
-    //    throw ParseException("The line must contain exactly one '>'", line, lineNumber);
-    //}
+    // Make sure there are no additional '>'
+    if (line.find('>', pos + 1) != std::string::npos) {
+        throw ParseException("The line must contain exactly one '>'", line, lineNumber);
+    }
 }
 
 /**
@@ -80,14 +80,6 @@ int main(int argc, const char** argv) {
         return EXIT_FAILURE;
     }
 
-    std::cout << "#########" << std::endl;
-    std::cout << "# Lines #" << std::endl;
-    std::cout << "#########" << std::endl << std::endl;
-    for (auto line: lines) {
-        std::cout << "Line: " << line << std::endl;
-    }
-    std::cout << std::endl;
-
     // Convert parsed lines to dependency structs
     std::vector<dag::Dependency> dependencies = dag::convert_dependencies(lines);
     std::vector<std::shared_ptr<dag::DagNode>> startNodes;
@@ -101,7 +93,7 @@ int main(int argc, const char** argv) {
     }
     std::cout << std::endl;
 
-    //write_svg(startNodes, "dag.svg");
-    //system("open dag.svg");
+    write_svg(startNodes, "dag.svg");
+    system("open dag.svg");
     return EXIT_SUCCESS;
 } 

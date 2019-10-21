@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <iostream>
 #include <memory>
 #include <set>
@@ -93,5 +94,6 @@ int main(int argc, const char** argv) {
 
     write_svg(startNodes, "/tmp/dag.svg");
     system("open /tmp/dag.svg");
+    remove("/tmp/dag.svg");
     return EXIT_SUCCESS;
 } 

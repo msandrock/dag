@@ -8,22 +8,22 @@
  * Emit markup for a single dependency node
  */
 void _write_node(std::fstream& stream, std::shared_ptr<dag::DagNode> node) {
-    const int WIDTH = 200, HEIGHT = 60;
+    const int WIDTH = 240, HEIGHT = 40;
     const int XOFFSET = WIDTH + 100;
-    const int YOFFSET = HEIGHT + 100;
+    const int YOFFSET = HEIGHT + 50;
 
     stream << "<rect x=\"" << node->x * XOFFSET << "\" y=\"" << node->y * YOFFSET << "\" width=\"" << WIDTH << "\" height=\"" << HEIGHT << "\" />" << std::endl;
-    stream << "<text x=\"" << (node->x * XOFFSET + WIDTH / 2) << "\" y=\"" << (node->y * YOFFSET + 5 + HEIGHT / 2) << "\">" << node->name << "</text>" << std::endl;
+    stream << "<text x=\"" << (node->x * XOFFSET + WIDTH / 2 - 90) << "\" y=\"" << (node->y * YOFFSET + 5 + HEIGHT / 2) << "\">" << node->name << "</text>" << std::endl;
 }
 
 /**
  * Emit markup to draw a connecting line between two nodes
  */
 void _write_edge(std::fstream& stream, std::shared_ptr<dag::DagNode> nodeStart, std::shared_ptr<dag::DagNode> nodeEnd) {
-    const int WIDTH = 200, HEIGHT = 60;
+    const int WIDTH = 240, HEIGHT = 40;
     const int XOFFSET = WIDTH + 100;
-    const int YOFFSET = HEIGHT + 100;
-    stream << "<line x1=\"" << (nodeStart->x * XOFFSET + WIDTH) << "\" y1=\"" << (nodeStart->y * YOFFSET + 5 + HEIGHT / 2) << "\" x2=\""<< (nodeEnd->x * XOFFSET) << "\" y2=\"" << (nodeEnd->y * YOFFSET + 5 + HEIGHT / 2) << "\" />" << std::endl;
+    const int YOFFSET = HEIGHT + 50;
+    stream << "<line x1=\"" << (nodeStart->x * XOFFSET + WIDTH) << "\" y1=\"" << (nodeStart->y * YOFFSET + 5 + HEIGHT / 2) << "\" x2=\""<< (nodeEnd->x * XOFFSET) << "\" y2=\"" << (nodeEnd->y * YOFFSET + 5 + HEIGHT / 2) << "\" marker-end=\"url(#arrow)\" />" << std::endl;
 }
 
 /**
@@ -55,9 +55,18 @@ void write_svg(const std::vector<std::shared_ptr<dag::DagNode>>& startNodes, con
     stream << "viewBox=\"0 0 1800 1600\" ";
     stream << ">" << std::endl;
 
-    stream << "<title>Titel der Datei</title>" << std::endl;
-    stream << "<desc>Beschreibung/Textalternative zum Inhalt.</desc>" << std::endl;
-    
+    stream << "<title>DAG</title>" << std::endl;
+    stream << "<desc>Generated using dag cli</desc>" << std::endl;
+
+    // Source: https://developer.mozilla.org/de/docs/Web/SVG/Element/marker
+    stream << "<defs>" << std::endl;
+    stream << " <marker id=\"arrow\" viewBox=\"0 0 10 10\" refX=\"5\" refY=\"5\" ";
+    stream << " markerWidth=\"12\" markerHeight=\"12\" ";
+    stream << " orient=\"auto-start-reverse\">" << std::endl;
+    stream << "     <path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"#f00\" />" << std::endl;
+    stream << " </marker>" << std::endl;
+    stream << "</defs>" << std::endl;
+
     stream << "<style type=\"text/css\">" << std::endl;
     stream << "rect { stroke: #888; fill: #ccc; }" << std::endl;
     stream << "text { fill: #f00; }" << std::endl;

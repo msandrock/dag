@@ -286,6 +286,8 @@ namespace dag {
      * Count the number of nodes in the dag
      */
     size_t get_node_count(const node_vec& startNodes) {
+        // This uses the std::hash<std::unique_ptr> implementation
+        // to calculate an unique hash for the node
         std::unordered_set<node_ptr> accumulator;
 
         for (auto startNode: startNodes) {

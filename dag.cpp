@@ -225,10 +225,11 @@ namespace dag {
     void _calculate_child_positions(node_ptr parentNode, int x, int y) {
         // Update all child nodes
         for (auto node: parentNode->children) {
-            node->x = x+1;
-            node->y = ++y;
+            node->x = x + 1;
+            node->y = y++;
 
-            _calculate_child_positions(node, x+1, y);
+            //std::cout << "set " << node->name << " to " << node->x << "/" << node->y << std::endl;
+            _calculate_child_positions(node, x + 1, y);
         }
     }
 

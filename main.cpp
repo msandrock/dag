@@ -86,6 +86,9 @@ int main(int argc, const char** argv) {
     dag::node_vec startNodes;
     build_dag(dependencies, startNodes);
 
+    //auto nodeCount = get_node_count(startNodes);
+    //std::cout << "Created dag with " << nodeCount << " nodes" << std::endl;
+
     //std::cout << "#######" << std::endl;
     //std::cout << "# DAG #" << std::endl;
     //std::cout << "#######" << std::endl;
@@ -94,6 +97,6 @@ int main(int argc, const char** argv) {
 
     write_svg(startNodes, "/tmp/dag.svg");
     system("open /tmp/dag.svg");
-    remove("/tmp/dag.svg");
+    //remove("/tmp/dag.svg");
     return EXIT_SUCCESS;
 } 

@@ -81,9 +81,9 @@ int main(int argc, const char** argv) {
     }
 
     // Convert parsed lines to dependency structs
-    std::vector<dag::Dependency> dependencies = dag::convert_dependencies(lines);
-    std::vector<std::shared_ptr<dag::DagNode>> startNodes;
-    build_dag(&dependencies, &startNodes);
+    dag::dependency_vec dependencies = dag::convert_dependencies(lines);
+    dag::node_vec startNodes;
+    build_dag(dependencies, startNodes);
 
     for (auto startNode: startNodes) {
         std::cout << "#######" << std::endl;

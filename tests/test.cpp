@@ -54,10 +54,10 @@ void _test_convert_dependencies() {
 void _test_add_standalone_node() {
     // Create dependencies for test with no downstream
     dag::Dependency deps[] = { dag::Dependency { "a" } };
-    std::vector<dag::Dependency> dependencies(std::begin(deps), std::end(deps));
-    std::vector<std::shared_ptr<dag::DagNode>> startNodes;
+    dag::dependency_vec dependencies(std::begin(deps), std::end(deps));
+    dag::node_vec startNodes;
     // Build dag
-    dag::build_dag(&dependencies, &startNodes);
+    dag::build_dag(dependencies, startNodes);
     // The dependency should be marked as used
     assert(dependencies[0].used == 1);
     // The dag should consist of the node 'a'
@@ -68,10 +68,10 @@ void _test_add_standalone_node() {
 void _test_add_single_dependency() {
     // Create dependencies for test
     dag::Dependency deps[] = { dag::Dependency { "a", "b" } };
-    std::vector<dag::Dependency> dependencies(std::begin(deps), std::end(deps));
-    std::vector<std::shared_ptr<dag::DagNode>> startNodes;
+    dag::dependency_vec dependencies(std::begin(deps), std::end(deps));
+    dag::node_vec startNodes;
     // Build dag
-    dag::build_dag(&dependencies, &startNodes);
+    dag::build_dag(dependencies, startNodes);
     // Only one dag should be generated
     assert(startNodes.size() == 1);
     //assert(dependencies[0].used == 1);
@@ -86,10 +86,10 @@ void _test_add_double_dependency() {
         dag::Dependency { "a", "b" },
         dag::Dependency { "b", "c" }
     };
-    std::vector<dag::Dependency> dependencies(std::begin(deps), std::end(deps));
-    std::vector<std::shared_ptr<dag::DagNode>> startNodes;
+    dag::dependency_vec dependencies(std::begin(deps), std::end(deps));
+    dag::node_vec startNodes;
     // Build dag
-    dag::build_dag(&dependencies, &startNodes);
+    dag::build_dag(dependencies, startNodes);
     // Only one dag should be generated
     assert(startNodes.size() == 1);
     //assert(dependencies[0].used == 1);
@@ -104,14 +104,13 @@ void _test_add_reversed_dependency() {
         dag::Dependency { "b", "c" },
         dag::Dependency { "a", "b" }
     };
-    std::vector<dag::Dependency> dependencies(std::begin(deps), std::end(deps));
-    std::vector<std::shared_ptr<dag::DagNode>> startNodes;
+    dag::dependency_vec dependencies(std::begin(deps), std::end(deps));
+    dag::node_vec startNodes;
     // Build dag
-    dag::build_dag(&dependencies, &startNodes);
+    dag::build_dag(dependencies, startNodes);
     // Only one dag should be generated
     assert(startNodes.size() == 1);
     //assert(dependencies[0].used == 1);
-
     // The dag should consist of the nodes 'a', 'b' and 'c'
     assert(get_node_count(startNodes) == 3);
 }
@@ -133,10 +132,10 @@ void _test_dependency_recombine() {
         dag::Dependency { "b", "d" },
         dag::Dependency { "c", "d" }
     };
-    std::vector<dag::Dependency> dependencies(std::begin(deps), std::end(deps));
-    std::vector<std::shared_ptr<dag::DagNode>> startNodes;
+    dag::dependency_vec dependencies(std::begin(deps), std::end(deps));
+    dag::node_vec startNodes;
     // Build dag
-    dag::build_dag(&dependencies, &startNodes);
+    dag::build_dag(dependencies, startNodes);
     // Only one dag should be generated
     assert(startNodes.size() == 1);
     //assert(dependencies[0].used == 1);

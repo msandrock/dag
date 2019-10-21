@@ -8,22 +8,33 @@
  * Emit markup for a single dependency node
  */
 void _write_node(std::fstream& stream, std::shared_ptr<dag::DagNode> node) {
+    const int OFFSET = 25;  // Offset to canvas corner
     const int WIDTH = 240, HEIGHT = 40;
     const int XOFFSET = WIDTH + 100;
     const int YOFFSET = HEIGHT + 50;
 
-    stream << "<rect x=\"" << node->x * XOFFSET << "\" y=\"" << node->y * YOFFSET << "\" width=\"" << WIDTH << "\" height=\"" << HEIGHT << "\" />" << std::endl;
-    stream << "<text x=\"" << (node->x * XOFFSET + WIDTH / 2 - 90) << "\" y=\"" << (node->y * YOFFSET + 5 + HEIGHT / 2) << "\">" << node->name << "</text>" << std::endl;
+    // Source: https://stackoverflow.com/questions/5546346/how-to-place-and-center-text-in-an-svg-rectangle/44857272#44857272
+    /*
+    stream << "<svg width=\"" << WIDTH << "\" height=\"" << HEIGHT << "\">" << std::endl;
+    stream << "<rect x=\"0\" y=\"0\" width=\"" << WIDTH << "\" height=\"" << HEIGHT << "\" />" << std::endl;
+    stream << "<text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\">" << node->name << "</text>" << std::endl;
+    stream << "</svg>" << std::endl;
+    */
+
+    stream << "<rect x=\"" << node->x * XOFFSET + OFFSET << "\" y=\"" << node->y * YOFFSET + OFFSET << "\" width=\"" << WIDTH << "\" height=\"" << HEIGHT << "\" />" << std::endl;
+    //stream << "<ellipse cx=\"" << node->x * XOFFSET + OFFSET + WIDTH / 2 << "\" cy=\"" << node->y * YOFFSET + OFFSET + HEIGHT / 2 << "\" rx=\"" << WIDTH / 2 << "\" ry=\"" << HEIGHT / 2 << "\" />" << std::endl;
+    stream << "<text x=\"" << (node->x * XOFFSET + WIDTH / 2 - 90 + OFFSET) << "\" y=\"" << (node->y * YOFFSET + 5 + HEIGHT / 2 + OFFSET) << "\">" << node->name << "</text>" << std::endl;
 }
 
 /**
  * Emit markup to draw a connecting line between two nodes
  */
 void _write_edge(std::fstream& stream, std::shared_ptr<dag::DagNode> nodeStart, std::shared_ptr<dag::DagNode> nodeEnd) {
+    const int OFFSET = 25;  // Offset to canvas corner
     const int WIDTH = 240, HEIGHT = 40;
     const int XOFFSET = WIDTH + 100;
     const int YOFFSET = HEIGHT + 50;
-    stream << "<line x1=\"" << (nodeStart->x * XOFFSET + WIDTH) << "\" y1=\"" << (nodeStart->y * YOFFSET + 5 + HEIGHT / 2) << "\" x2=\""<< (nodeEnd->x * XOFFSET) << "\" y2=\"" << (nodeEnd->y * YOFFSET + 5 + HEIGHT / 2) << "\" marker-end=\"url(#arrow)\" />" << std::endl;
+    stream << "<line x1=\"" << (nodeStart->x * XOFFSET + WIDTH + OFFSET) << "\" y1=\"" << (nodeStart->y * YOFFSET + 5 + HEIGHT / 2 + OFFSET) << "\" x2=\""<< (nodeEnd->x * XOFFSET + OFFSET) << "\" y2=\"" << (nodeEnd->y * YOFFSET + 5 + HEIGHT / 2 + OFFSET) << "\" marker-end=\"url(#arrow)\" />" << std::endl;
 }
 
 /**
@@ -51,7 +62,6 @@ void write_svg(const std::vector<std::shared_ptr<dag::DagNode>>& startNodes, con
     stream << "<svg xmlns=\"http://www.w3.org/2000/svg\" ";
     stream << "xmlns:xlink=\"http://www.w3.org/1999/xlink\" ";
     stream << "version=\"1.1\" baseProfile=\"full\" ";
-    stream << "width=\"1800\" height=\"1600\" ";
     stream << "viewBox=\"0 0 1800 1600\" ";
     stream << ">" << std::endl;
 
@@ -68,8 +78,8 @@ void write_svg(const std::vector<std::shared_ptr<dag::DagNode>>& startNodes, con
     stream << "</defs>" << std::endl;
 
     stream << "<style type=\"text/css\">" << std::endl;
-    stream << "rect { stroke: #888; fill: #ccc; }" << std::endl;
-    stream << "text { fill: #f00; }" << std::endl;
+    stream << "rect, ellipse { stroke: #888; fill: #ccc; }" << std::endl;
+    stream << "text { fill: #000; font-family: Arial, Sans-serif; }" << std::endl;
     stream << "line { stroke: #f00; }" << std::endl;
     stream << "</style>" << std::endl;
 

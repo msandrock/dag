@@ -11,8 +11,8 @@ namespace dag {
      */
     DagNode::DagNode(const std::string& name) {
         this->name = name;
-        this->x = 0;
-        this->y = 0;
+        this->x = -1;
+        this->y = -1;
     }
 
     /**
@@ -225,8 +225,10 @@ namespace dag {
     void _calculate_child_positions(node_ptr parentNode, int x, int y) {
         // Update all child nodes
         for (auto node: parentNode->children) {
-            node->x = x + 1;
-            node->y = y++;
+            if (node->x == -1) {
+                node->x = x;
+                node->y = y++;
+            }
 
             //std::cout << "set " << node->name << " to " << node->x << "/" << node->y << std::endl;
             _calculate_child_positions(node, x + 1, y);
@@ -237,9 +239,8 @@ namespace dag {
      * Assign x and y positions to dag nodes
      */
     void _calculate_positions(node_vec& startNodes) {
-        // TODO: Iterate over the dag and compute the node indentations. 
+        // Iterate over the dag and compute the node indentations. 
         // If the indentation is greater than before, update it.
-        // Add x/y coordinates.
         int x = 0, y = 0;
 
         for (auto startNode: startNodes) {
@@ -247,7 +248,7 @@ namespace dag {
             startNode->y = y;
 
             // Assign coordinates for nodes
-            _calculate_child_positions(startNode, x, y);
+            _calculate_child_positions(startNode, x + 1, y);
             y++;
         }
     }

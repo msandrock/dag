@@ -2,6 +2,10 @@ a>b
 b>c
 c>d
 b>e
-# Just a comment
+# Recombine d and e on f
 d>f
 e>f
+
+# It is okay, if we get two dags here  - needs merge during rendering
+#a>c
+#b>c

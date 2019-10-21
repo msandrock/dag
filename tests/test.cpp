@@ -18,8 +18,18 @@ void _test_convert_dependencies() {
         assert(dependencies[0].used == 0);
     }
     {
+        // Simple dependency pair
         std::vector<std::string> lines;
         lines.push_back("a>b");
+        auto dependencies = dag::convert_dependencies(lines);
+        assert(dependencies.size() == 1);
+        assert(dependencies[0].name == "a");
+        assert(dependencies[0].downstream == "b");
+    }
+    {
+        // White space removal
+        std::vector<std::string> lines;
+        lines.push_back(" a> b ");
         auto dependencies = dag::convert_dependencies(lines);
         assert(dependencies.size() == 1);
         assert(dependencies[0].name == "a");
@@ -112,6 +122,33 @@ void _test_add_reversed_dependency() {
     assert(get_node_count(*startNodes[0]) == 3);
 }
 
+void _test_dependency_recombine() {
+    /*
+    a>b b>d
+    a>c c>d
+  
+        /---b---\
+    a---         ---d
+        \---c---/
+    */
+
+    // Create dependencies for test
+    dag::Dependency deps[] = {
+        dag::Dependency { "a", "b" },
+        dag::Dependency { "a", "c" },
+        dag::Dependency { "b", "d" },
+        dag::Dependency { "c", "d" }
+    };
+    std::vector<dag::Dependency> dependencies(std::begin(deps), std::end(deps));
+    std::vector<std::shared_ptr<dag::DagNode>> startNodes;
+    // Build dag
+    dag::build_dag(&dependencies, &startNodes);
+    // Only one dag should be generated
+    assert(startNodes.size() == 1);
+    //assert(dependencies[0].used == 1);
+    assert(get_node_count(*startNodes[0]) == 4);
+}
+
 void run_all_tests() {
     std::cout << "Running tests" << std::endl;
     _test_convert_dependencies();
@@ -119,5 +156,6 @@ void run_all_tests() {
     _test_add_single_dependency();
     _test_add_double_dependency();
     _test_add_reversed_dependency();
+    _test_dependency_recombine();
     std::cout << "All tests complete" << std::endl;
 }

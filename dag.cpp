@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "dag.hpp"
+#include "stdafx.hpp"
 
 namespace dag {
     /**
@@ -26,6 +27,9 @@ namespace dag {
         } else {
             dependency.name = line;
         }
+
+        trim(dependency.name);
+        trim(dependency.downstream);
 
         return dependency;
     }
@@ -131,12 +135,7 @@ namespace dag {
                 childNode = std::shared_ptr<DagNode>(new DagNode(dependency.name));
             }
 
-            // If the downstream node is not an upstream dependency to another node, add it as a standalone node
-            // Find nodes that have the downstream node as a dependency
-            // e.g. a>b - b is not a dependency of any other node - add it as standalone
-            // Find nodes that have 'c' as a parent
-
-            if (!leafAdded) {
+            if (!leafAdded && !(*dependencies).data()[i].used) {
                 leafAdded = _append_leaf_node(childNode, dependencies, dependency);
             }
 
@@ -155,11 +154,11 @@ namespace dag {
             i++;
         }
     }
-    
+
     /**
-     * Construct dag from the given dependencies
-     */ 
-    void build_dag(std::vector<Dependency>* dependencies, std::vector<std::shared_ptr<DagNode>>* startNodes) {
+     * Find all start nodes in the graph and add then to the collection
+     */
+    void _append_start_nodes(std::vector<Dependency>* dependencies, std::vector<std::shared_ptr<DagNode>>* startNodes) {
         // 1. Every node that is not a child node is automatically a start node
         int i = 0;
         for (auto dependency: *dependencies) {
@@ -167,17 +166,37 @@ namespace dag {
             _find_upstream_dependency(dependency, dependencies, &upstream);
             
             if (upstream == nullptr) {
+                // We have two dependencies a>b and a>c - both qualify as start nodes. We only want to add one start node for 'a'
+                // Check if a start node with the same name exists, before adding a new one.
+                bool found = false;
+                for (auto node: *startNodes) {
+                    if (node->name == dependency.name) {
+                        found = true;
+                    }
+                }
+
+                // Start node already added - skip
+                if (found) continue;
+                
                 std::shared_ptr<DagNode> startNode(new DagNode(dependency.name));
                 startNodes->push_back(startNode);
                 // Set the use flag, if the dependency has no downstreams
                 if (dependency.downstream == "") {
-                    dependencies->data()[i].used++;
+                    (*dependencies).data()[i].used++;
                 }
             }
 
             i++;
         }
+    }
 
+    /**
+     * Construct dag from the given dependencies
+     */ 
+    void build_dag(std::vector<Dependency>* dependencies, std::vector<std::shared_ptr<DagNode>>* startNodes) {
+        // 1. Every node that is not a child node is automatically a start node
+        _append_start_nodes(dependencies, startNodes);
+        
         // Construct dags for all start nodes
         for (auto startNode: *startNodes) {
             // Pass in the current dag - add all nodes to the end nodes

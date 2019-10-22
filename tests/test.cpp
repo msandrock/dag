@@ -27,6 +27,21 @@ void _test_convert_dependencies() {
         assert(dependencies[0].downstream == "b");
     }
     {
+        // Multiple dependencies with separator
+        std::vector<std::string> lines;
+        lines.push_back("a>b,a>c,b>d, c> d");
+        auto dependencies = dag::convert_dependencies(lines);
+        assert(dependencies.size() == 4);
+        assert(dependencies[0].name == "a");
+        assert(dependencies[0].downstream == "b");
+        assert(dependencies[1].name == "a");
+        assert(dependencies[1].downstream == "c");
+        assert(dependencies[2].name == "b");
+        assert(dependencies[2].downstream == "d");
+        assert(dependencies[3].name == "c");
+        assert(dependencies[3].downstream == "d");
+    }
+    {
         // White space removal
         std::vector<std::string> lines;
         lines.push_back(" a> b ");

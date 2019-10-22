@@ -24,22 +24,6 @@ class Exception : public std::exception {
     }
 };
 
-class ParseException : public Exception {
-    std::string line;
-    int lineNumber;
-
-    public:
-    ParseException(std::string message, std::string line, int lineNumber)
-        : Exception(message), line(line), lineNumber(lineNumber) {
-    }
-
-    std::string getMessage() {
-        std::stringstream message;
-        message << "Could not parse line " << this->lineNumber << " \"" << this->line << "\": " << this->message; 
-        return message.str(); 
-    }
-};
-
 //
 // Trim functions
 //

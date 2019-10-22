@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -37,6 +38,30 @@ namespace dag {
     }
 
     /**
+     * Convert list of lines into dependency structs
+     */
+    std::vector<Dependency> convert_dependencies(const std::vector<std::string>& lines) {
+        std::vector<Dependency> dependencies;
+
+        for (auto line: lines) {
+            // Ignore empty lines and comments
+            if (line == "" || line[0] == '#') continue;
+
+            // Tokenize line
+            std::istringstream iss(line);
+            std::string token;
+
+            // Line has , as separator?
+            while (std::getline(iss, token, ',')) {
+                auto dependency = convert_dependency(token);
+                dependencies.push_back(dependency);
+            }
+        }
+
+        return dependencies;
+    }
+
+    /**
      * Find a particular node in the dag
      */
     void _find_node(const std::string& needle, const node_vec& nodes, node_ptr* found) {
@@ -54,23 +79,6 @@ namespace dag {
                 return;
             }
         }
-    }
-
-    /**
-     * Convert list of lines into dependency structs
-     */
-    std::vector<Dependency> convert_dependencies(const std::vector<std::string>& lines) {
-        std::vector<Dependency> dependencies;
-
-        for (auto line: lines) {
-            // Ignore empty lines and comments
-            if (line == "" || line[0] == '#') continue;
-
-            auto dependency = convert_dependency(line);
-            dependencies.push_back(dependency);
-        }
-
-        return dependencies;
     }
 
     /**

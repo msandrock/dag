@@ -52,7 +52,7 @@
         {
             "label": "Run test",
             "type": "shell",
-            "command": "./dag_test",
+            "command": "./bin/dag_test",
             "group": "build",
             "problemMatcher": []
         },

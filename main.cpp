@@ -17,23 +17,6 @@
 #endif
 
 /**
- * Verify entries - throw exception on errors
- */
-void verify_format(const std::string& line, int lineNumber) {
-    // Make sure there is exactly one '>'
-    auto pos = line.find('>');
-
-    if (pos == std::string::npos) {
-        return;
-    }
-
-    // Make sure there are no additional '>'
-    if (line.find('>', pos + 1) != std::string::npos) {
-        throw ParseException("The line must contain exactly one '>'", line, lineNumber);
-    }
-}
-
-/**
  * Consume all lines from stdin and return a list of verified entries
  */
 std::vector<std::string> parse_stdin() {
@@ -42,7 +25,6 @@ std::vector<std::string> parse_stdin() {
 
     for (std::string line; std::getline(std::cin, line); lineNumber++) {
         trim(line);
-        verify_format(line, lineNumber);
         lines.push_back(line);
     }
 
@@ -73,14 +55,7 @@ int main(int argc, const char** argv) {
     return EXIT_SUCCESS;
 #endif
     // Collect parsed lines
-    std::vector<std::string> lines; 
-    try {
-        lines = parse_stdin();
-    } catch(ParseException e) {
-        std::cout << e.getMessage() << std::endl;
-        return EXIT_FAILURE;
-    }
-
+    std::vector<std::string> lines = parse_stdin();
     // Convert parsed lines to dependency structs
     dag::dependency_vec dependencies = dag::convert_dependencies(lines);
     dag::node_vec startNodes;

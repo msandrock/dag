@@ -7,7 +7,7 @@ CFLAGS  = -std=c++17 -optimize: -O3 -Wall -DVERSION=\"$(VERSION)\" -Werror #-Wmi
 #CFLAGS  = -std=c++17 -g -Wall -DVERSION=\"$(VERSION)\" -Werror #-Wmissing-prototypes
 #LFLAGS  = -v
 
-all: $(BINARY)
+all: $(BINARY) $(TEST_BINARY)
 
 ${BINARY}: *.cpp
 	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
@@ -20,4 +20,4 @@ clean:
 	if [ -f ${TEST_BINARY} ] ; then rm ${TEST_BINARY} ; fi
 
 cppcheck:
-	cppcheck --enable=warning --inconclusive --force --std=c++11 src/* --error-exitcode=1
+	cppcheck --enable=warning --inconclusive --force --std=c++11 *.?pp --error-exitcode=1

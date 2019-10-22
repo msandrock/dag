@@ -53,16 +53,54 @@ void _write_node_array(std::fstream& stream, const std::vector<std::shared_ptr<d
 }
 
 /**
+ * Calculate the maximum branch length
+ */
+int _get_branch_length(const dag::node_vec& nodes, int length) {
+    if (nodes.size()) {
+        length++;
+    }
+
+    int maxLength = length;
+    for (auto node: nodes) {
+        auto branchLength = _get_branch_length(node->children, length);
+
+        if (branchLength > maxLength) {
+            maxLength = branchLength;
+        }
+    }
+
+    return maxLength;
+}
+
+/**
+ * Calculate the maximum path length in the dag
+ */
+int _get_dag_length(const dag::node_vec& startNodes) {
+    int length = startNodes.size() ? 1 : 0;
+    int maxLength = length;
+    for (auto startNode: startNodes) {
+        auto branchLength = _get_branch_length(startNode->children, length);
+
+        if(branchLength > maxLength) {
+            maxLength = branchLength;
+        }
+    }
+
+    return maxLength;
+}
+
+/**
  * Creates an svg for the given dags
  */
-void write_svg(const std::vector<std::shared_ptr<dag::DagNode>>& startNodes, const std::string& filename) {
+void write_svg(const dag::node_vec& startNodes, const std::string& filename) {
     std::fstream stream(filename, std::ios::out);
+    auto length = _get_dag_length(startNodes);
 
     stream << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
     stream << "<svg xmlns=\"http://www.w3.org/2000/svg\" ";
     stream << "xmlns:xlink=\"http://www.w3.org/1999/xlink\" ";
     stream << "version=\"1.1\" baseProfile=\"full\" ";
-    stream << "viewBox=\"0 0 1800 1600\" ";
+    stream << "viewBox=\"0 0 " << length * 350 << " " << length * 200 << "\" ";
     stream << ">" << std::endl;
 
     stream << "<title>DAG</title>" << std::endl;

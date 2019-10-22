@@ -4,6 +4,6 @@
 #include <vector>
 #include "dag.hpp"
 
-void write_svg(const std::vector<std::shared_ptr<dag::DagNode>>& startNodes, const std::string& filename);
+void write_svg(const dag::node_vec& startNodes, const std::string& filename);
 
 #endif

@@ -10,10 +10,10 @@ CFLAGS  = -std=c++17 -optimize: -O3 -Wall -DVERSION=\"$(VERSION)\" -Werror #-Wmi
 all: $(BINARY) $(TEST_BINARY)
 
 ${BINARY}: *.cpp
-	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
+	$(CC) $(CFLAGS) -o bin/$@ $^ $(LFLAGS)
 
 ${TEST_BINARY}: *.cpp tests/*.cpp
-	$(CC) $(CFLAGS) -DTEST=1 -o $@ $^ $(LFLAGS)
+	$(CC) $(CFLAGS) -DTEST=1 -o bin/$@ $^ $(LFLAGS)
 
 clean:
 	if [ -f ${BINARY} ] ; then rm ${BINARY} ; fi

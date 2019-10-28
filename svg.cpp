@@ -7,7 +7,7 @@
 /*
  * Emit markup for a single dependency node
  */
-void _write_node(std::fstream& stream, std::shared_ptr<dag::DagNode> node) {
+void _write_node(std::fstream& stream, const dag::node_ptr& node) {
     const int OFFSET = 25;  // Offset to canvas corner
     const int WIDTH = 240, HEIGHT = 40;
     const int XOFFSET = WIDTH + 100;
@@ -29,7 +29,7 @@ void _write_node(std::fstream& stream, std::shared_ptr<dag::DagNode> node) {
 /**
  * Emit markup to draw a connecting line between two nodes
  */
-void _write_edge(std::fstream& stream, std::shared_ptr<dag::DagNode> nodeStart, std::shared_ptr<dag::DagNode> nodeEnd) {
+void _write_edge(std::fstream& stream, const dag::node_ptr& nodeStart, const dag::node_ptr& nodeEnd) {
     const int OFFSET = 25;  // Offset to canvas corner
     const int WIDTH = 240, HEIGHT = 40;
     const int XOFFSET = WIDTH + 100;
@@ -40,7 +40,7 @@ void _write_edge(std::fstream& stream, std::shared_ptr<dag::DagNode> nodeStart, 
 /**
  * Recursively emit markup for a list of nodes
  */
-void _write_node_array(std::fstream& stream, const std::vector<std::shared_ptr<dag::DagNode>>& nodes, std::shared_ptr<dag::DagNode> parentNode = nullptr) {
+void _write_node_array(std::fstream& stream, const dag::node_vec& nodes, const dag::node_ptr& parentNode = nullptr) {
     for (auto node: nodes) {
         // Draw edge from parent node to connected node
         if (parentNode != nullptr) {

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <unordered_set>
@@ -161,11 +162,9 @@ namespace dag {
 
             // Check if the current node has a child node for the given upstream yet
             node_ptr childNode(nullptr);
-            bool nodeExists = true;
             _find_node(dependency.name, startNodes, &childNode);
 
             if (childNode == nullptr) {
-                nodeExists = false;
                 childNode = std::make_shared<DagNode>(dependency.name);
             }
 
@@ -264,6 +263,22 @@ namespace dag {
     }
 
     /**
+     * Relocate node if it has a downstream with greater x
+     */
+    void _shift_positions(node_vec& nodes) {
+        for (auto node: nodes) {
+            // Check all child nodes
+            for (auto child: node->children) {
+                if (child->x <= node->x) {
+                    child->x = node->x + 1;
+                }
+
+                _shift_positions(node->children);
+            }
+        }
+    }
+
+    /**
      * Construct dag from the given dependencies
      */ 
     void build_dag(dependency_vec& dependencies, node_vec& startNodes) {
@@ -280,6 +295,7 @@ namespace dag {
         // TODO: Detect circular dependencies
         // 2. Every node that references an ancestor node is invalid
         _calculate_positions(startNodes);
+        _shift_positions(startNodes);
     }
 
     /**

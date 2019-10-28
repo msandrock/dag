@@ -54,6 +54,12 @@ int main(int argc, const char** argv) {
     run_all_tests();
     return EXIT_SUCCESS;
 #endif
+    // Check for command line parameters
+    if (argc > 1 && std::string(argv[1]) == "-v") {
+        std::cout << VERSION << std::endl;
+        return EXIT_SUCCESS;
+    }
+
     // Collect parsed lines
     std::vector<std::string> lines = parse_stdin();
     // Convert parsed lines to dependency structs

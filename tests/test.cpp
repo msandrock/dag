@@ -159,6 +159,36 @@ void _test_dependency_recombine() {
 
 // TODO: Write test for findnode
 
+void _test_dependency_rearrange() {
+    // Make sure nodes are arranged, so no dependencies go from right to left
+    dag::Dependency deps[] = {
+        dag::Dependency { "a", "b" },
+        dag::Dependency { "a", "c" },
+        dag::Dependency { "b", "e" },
+        dag::Dependency { "c", "d" },
+        dag::Dependency { "d", "e" }
+    };
+    dag::dependency_vec dependencies(std::begin(deps), std::end(deps));
+    dag::node_vec startNodes;
+
+    dag::build_dag(dependencies, startNodes);
+    
+    // Level 1
+    assert(startNodes[0]->name == "a");
+    assert(startNodes[0]->x == 0);
+    // Level 2
+    assert(startNodes[0]->children[0]->name == "b");
+    assert(startNodes[0]->children[0]->x == 1);
+    assert(startNodes[0]->children[1]->name == "c");
+    assert(startNodes[0]->children[1]->x == 1);
+    // Level 3:
+    assert(startNodes[0]->children[1]->children[0]->name == "d");
+    assert(startNodes[0]->children[1]->children[0]->x == 2);
+    // Level 4 (This node should be shifted by one level)
+    assert(startNodes[0]->children[0]->children[0]->name == "e");
+    assert(startNodes[0]->children[0]->children[0]->x == 3);
+}
+
 void run_all_tests() {
     std::cout << "Running tests" << std::endl;
     _test_convert_dependencies();
@@ -167,5 +197,6 @@ void run_all_tests() {
     _test_add_double_dependency();
     _test_add_reversed_dependency();
     _test_dependency_recombine();
+    _test_dependency_rearrange();
     std::cout << "All tests complete" << std::endl;
 }

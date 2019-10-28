@@ -1,5 +1,6 @@
 #ifndef DAG_HPP
 #define DAG_HPP
+#include <memory>
 #include <set>
 #include <string>
 #include <vector>

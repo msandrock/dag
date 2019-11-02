@@ -15,7 +15,6 @@ void _test_convert_dependencies() {
         assert(dependencies.size() == 1);
         assert(dependencies[0].name == "a");
         assert(dependencies[0].downstream == "");
-        assert(dependencies[0].used == 0);
     }
     {
         // Simple dependency pair
@@ -73,8 +72,6 @@ void _test_add_standalone_node() {
     dag::node_vec startNodes;
     // Build dag
     dag::build_dag(dependencies, startNodes);
-    // The dependency should be marked as used
-    assert(dependencies[0].used == 1);
     // The dag should consist of the node 'a'
     assert(get_node_count(startNodes) == 1);
     assert(startNodes[0]->name == "a");
@@ -89,8 +86,6 @@ void _test_add_single_dependency() {
     dag::build_dag(dependencies, startNodes);
     // Only one dag should be generated
     assert(startNodes.size() == 1);
-    //assert(dependencies[0].used == 1);
-
     // The dag should consist of the two nodes 'a' and 'b'
     assert(get_node_count(startNodes) == 2);
 }
@@ -107,8 +102,6 @@ void _test_add_double_dependency() {
     dag::build_dag(dependencies, startNodes);
     // Only one dag should be generated
     assert(startNodes.size() == 1);
-    //assert(dependencies[0].used == 1);
-
     // The dag should consist of the nodes 'a', 'b' and 'c'
     assert(get_node_count(startNodes) == 3);
 }
@@ -125,7 +118,6 @@ void _test_add_reversed_dependency() {
     dag::build_dag(dependencies, startNodes);
     // Only one dag should be generated
     assert(startNodes.size() == 1);
-    //assert(dependencies[0].used == 1);
     // The dag should consist of the nodes 'a', 'b' and 'c'
     assert(get_node_count(startNodes) == 3);
 }
@@ -153,7 +145,6 @@ void _test_dependency_recombine() {
     dag::build_dag(dependencies, startNodes);
     // Only one dag should be generated
     assert(startNodes.size() == 1);
-    //assert(dependencies[0].used == 1);
     assert(get_node_count(startNodes) == 4);
 }
 

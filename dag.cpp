@@ -139,10 +139,6 @@ namespace dag {
             if (dependency.name == parentNode->name && dependency.downstream != "") {
                 // Check if we need to add the current downstream as a leaf node 
                 leafAdded = _append_leaf_node(startNodes, parentNode, dependencies, dependency);
-
-                if (leafAdded) {
-                    dependencies.data()[i].used++;
-                }
             }
 
             // Check if any of the upstreams points to the current node
@@ -170,10 +166,6 @@ namespace dag {
 
             if (!leafAdded) {
                 leafAdded = _append_leaf_node(startNodes, childNode, dependencies, dependency);
-
-                if (leafAdded) {
-                    dependencies.data()[i].used++;
-                }
             }
 
             // Append new node to parent
@@ -185,7 +177,6 @@ namespace dag {
                 _append_child_nodes(startNodes, childNode, dependencies);
             }
 
-            dependencies.data()[i].used++;
             i++;
         }
     }
@@ -219,10 +210,6 @@ namespace dag {
                 
             node_ptr startNode = std::make_shared<DagNode>(dependency.name);
             startNodes.push_back(startNode);
-            // Set the use flag, if the dependency has no downstreams
-            if (dependency.downstream == "") {
-                dependencies.data()[i].used++;
-            }
 
             i++;
         }

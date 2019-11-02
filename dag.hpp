@@ -15,7 +15,6 @@ namespace dag {
     struct Dependency {
         std::string name;
         std::string downstream;
-        int used;
     };
 
     struct DagNode {

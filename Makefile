@@ -1,7 +1,7 @@
 BINARY  = dag
 TEST_BINARY = $(BINARY)_test
 SHELL   = /bin/sh
-VERSION = 1.1.1
+VERSION = 1.1.2
 CC      = clang++		# Compiler name
 CFLAGS  = -std=c++17 -optimize: -O3 -Wall -DVERSION=\"$(VERSION)\" -Werror #-Wmissing-prototypes
 #CFLAGS  = -std=c++17 -g -Wall -DVERSION=\"$(VERSION)\" -Werror #-Wmissing-prototypes

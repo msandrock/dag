@@ -3,8 +3,7 @@
 #include <memory>
 #include <set>
 #include <vector>
-#include "test.hpp"
-#include "../dag.hpp"
+#include "../src/dag.hpp"
 
 void _test_convert_dependencies() {
     {
@@ -180,7 +179,7 @@ void _test_dependency_rearrange() {
     assert(startNodes[0]->children[0]->children[0]->x == 3);
 }
 
-void run_all_tests() {
+int main(int, char**) {
     std::cout << "Running tests" << std::endl;
     _test_convert_dependencies();
     _test_add_standalone_node();

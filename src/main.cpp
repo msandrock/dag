@@ -12,10 +12,6 @@
 #include "dag.hpp"
 #include "svg.hpp"
 
-#ifdef TEST
-#include "tests/test.hpp"
-#endif
-
 /**
  * Consume all lines from stdin and return a list of verified entries
  */
@@ -55,10 +51,6 @@ int main(int argc, const char** argv) {
         std::cout << VERSION << std::endl;
         return EXIT_SUCCESS;
     }
-#ifdef TEST
-    run_all_tests();
-    return EXIT_SUCCESS;
-#endif
     // Collect parsed lines
     std::vector<std::string> lines = parse_stdin();
     // Convert parsed lines to dependency structs

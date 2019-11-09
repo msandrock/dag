@@ -2,12 +2,15 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build using Makefile",
+            "label": "Build",
             "type": "shell",
-            "command": "make",
+            "command": "cmake",
             "group": "build",
+            "options": {
+                "cwd": "${workspaceRoot}/build"
+            },
             "args": [
-                "dag"
+                "./.."
             ],
             "problemMatcher": {
                 "owner": "cpp",
@@ -26,55 +29,16 @@
             }
         },
         {
-            "label": "Build test using Makefile",
+            "label": "Test",
             "type": "shell",
-            "command": "make",
+            "command": "ctest",
             "group": "build",
+            "options": {
+                "cwd": "${workspaceRoot}/build"
+            },
             "args": [
-                "dag_test"
-            ],
-            "problemMatcher": {
-                "owner": "cpp",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceRoot}"
-                ],
-                "pattern": {
-                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
-                    "file": 1,
-                    "line": 2,
-                    "column": 3,
-                    "severity": 4,
-                    "message": 5
-                }
-            }
-        },
-        {
-            "label": "Run test",
-            "type": "shell",
-            "command": "./bin/dag_test",
-            "group": "build",
-            "problemMatcher": []
-        },
-        {
-            "label": "Build and run test",
-            "dependsOn": ["Build test using Makefile", "Run test"],
-            "group": "build",
-            "problemMatcher": {
-                "owner": "cpp",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceRoot}"
-                ],
-                "pattern": {
-                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
-                    "file": 1,
-                    "line": 2,
-                    "column": 3,
-                    "severity": 4,
-                    "message": 5
-                }
-            }
+                "./.."
+            ]
         }
     ]
 }
